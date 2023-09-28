@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
 
 import som.compiler.ProgramDefinitionError;
 import som.vm.Universe;
+import som.vmobjects.SArray;
 import som.vmobjects.SClass;
 import som.vmobjects.SDouble;
 import som.vmobjects.SInteger;
@@ -95,6 +96,8 @@ public class BasicInterpreterTests {
         {"Arrays", "testPutAllNil", "Nil", SClass.class},
         {"Arrays", "testPutAllBlock", 3, SInteger.class},
         {"Arrays", "testNewWithAll", 1, SInteger.class},
+        {"Arrays", "testAtPut", 1, SInteger.class},
+        {"Arrays", "testPutDifferentTypes", "[a True]", SArray.class},
 
         {"BlockInlining", "testNoInlining", 1, SInteger.class},
         {"BlockInlining", "testOneLevelInlining", 1, SInteger.class},
@@ -186,6 +189,21 @@ public class BasicInterpreterTests {
       assertEquals(expected, actual);
       return;
     }
+
+    if (resultType == SArray.class) {
+      String expected = (String) expectedResult;
+      final SArray theArray = (SArray) actualResult;
+      final int numberOfIndexableFields = theArray.getNumberOfIndexableFields();
+      String[] actual = new String[numberOfIndexableFields];
+
+      for (int i = 0; i < numberOfIndexableFields; i++) {
+        actual[i] = theArray.getIndexableField(i).toString();
+      }
+
+      assertEquals(expected, Arrays.toString(actual));
+      return;
+    }
+
     fail("SOM Value handler missing for " + resultType);
   }
 
