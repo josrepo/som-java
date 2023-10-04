@@ -30,7 +30,6 @@ import som.vm.Universe;
 public class SArray extends SAbstractObject {
 
   public SArray(final SObject nilObject, long numElements) {
-    this.nilObject = nilObject;
     strategy = new EmptyStrategy(nilObject, (int) numElements);
   }
 
@@ -39,11 +38,7 @@ public class SArray extends SAbstractObject {
   }
 
   public void setIndexableField(long index, SAbstractObject value) {
-    if (strategy.shouldStrategyChange(value)) {
-      int numElements = strategy.getNumberOfIndexableFields();
-      strategy = new AbstractObjectStrategy(nilObject, numElements);
-    }
-
+    strategy = strategy.changeStrategyTo(value);
     strategy.setIndexableField((int) index, value);
   }
 
@@ -77,14 +72,13 @@ public class SArray extends SAbstractObject {
     return universe.arrayClass;
   }
 
-  private final SObject nilObject;
   private SArrayStorageStrategy strategy;
 
   private interface SArrayStorageStrategy {
     int getNumberOfIndexableFields();
     SAbstractObject getIndexableField(int index);
     void setIndexableField(int index, SAbstractObject value);
-    boolean shouldStrategyChange(SAbstractObject value);
+    SArrayStorageStrategy changeStrategyTo (SAbstractObject value);
   }
 
   private static class EmptyStrategy implements SArrayStorageStrategy {
@@ -113,8 +107,8 @@ public class SArray extends SAbstractObject {
     }
 
     @Override
-    public boolean shouldStrategyChange(SAbstractObject value) {
-      return value != nilObject;
+    public SArrayStorageStrategy changeStrategyTo(SAbstractObject value) {
+      return value == nilObject ? this : new AbstractObjectStrategy(nilObject, numElements);
     }
 
   }
@@ -147,8 +141,8 @@ public class SArray extends SAbstractObject {
     }
 
     @Override
-    public boolean shouldStrategyChange(SAbstractObject value) {
-      return false;
+    public SArrayStorageStrategy changeStrategyTo(SAbstractObject value) {
+      return this;
     }
 
   }
