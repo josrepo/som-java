@@ -30,7 +30,7 @@ import som.vm.Universe;
 public class SArray extends SAbstractObject {
 
   public SArray(final SObject nilObject, long numElements) {
-    indexableFields = new SAbstractObject[(int) numElements];
+    strategy = new SArrayAbstractObjectStrategy((int) numElements);
 
     // Clear each and every field by putting nil into them
     for (int i = 0; i < getNumberOfIndexableFields(); i++) {
@@ -39,15 +39,15 @@ public class SArray extends SAbstractObject {
   }
 
   public SAbstractObject getIndexableField(long index) {
-    return indexableFields[(int) index];
+    return strategy.getIndexableField((int) index);
   }
 
   public void setIndexableField(long index, SAbstractObject value) {
-    indexableFields[(int) index] = value;
+    strategy.setIndexableField((int) index, value);
   }
 
   public int getNumberOfIndexableFields() {
-    return indexableFields.length;
+    return strategy.getNumberOfIndexableFields();
   }
 
   public SArray copyAndExtendWith(SAbstractObject value, final Universe universe) {
@@ -76,6 +76,37 @@ public class SArray extends SAbstractObject {
     return universe.arrayClass;
   }
 
-  // Private array of indexable fields
-  private final SAbstractObject[] indexableFields;
+  private SArrayStorageStrategy strategy;
+
+  private interface SArrayStorageStrategy {
+    int getNumberOfIndexableFields();
+    SAbstractObject getIndexableField(int index);
+    void setIndexableField(int index, SAbstractObject value);
+  }
+
+  private static class SArrayAbstractObjectStrategy implements SArrayStorageStrategy {
+
+    private final SAbstractObject[] indexableFields;
+
+    private SArrayAbstractObjectStrategy(int numElements) {
+      indexableFields = new SAbstractObject[numElements];
+    }
+
+    @Override
+    public int getNumberOfIndexableFields() {
+      return indexableFields.length;
+    }
+
+    @Override
+    public SAbstractObject getIndexableField(int index) {
+      return indexableFields[index];
+    }
+
+    @Override
+    public void setIndexableField(int index, SAbstractObject value) {
+      indexableFields[index] = value;
+    }
+
+  }
+
 }
