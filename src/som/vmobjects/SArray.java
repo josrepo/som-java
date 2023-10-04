@@ -30,12 +30,8 @@ import som.vm.Universe;
 public class SArray extends SAbstractObject {
 
   public SArray(final SObject nilObject, long numElements) {
-    strategy = new SArrayAbstractObjectStrategy((int) numElements);
-
-    // Clear each and every field by putting nil into them
-    for (int i = 0; i < getNumberOfIndexableFields(); i++) {
-      setIndexableField(i, nilObject);
-    }
+    this.nilObject = nilObject;
+    strategy = new EmptyStrategy(nilObject, (int) numElements);
   }
 
   public SAbstractObject getIndexableField(long index) {
@@ -43,6 +39,11 @@ public class SArray extends SAbstractObject {
   }
 
   public void setIndexableField(long index, SAbstractObject value) {
+    if (strategy.shouldStrategyChange(value)) {
+      int numElements = strategy.getNumberOfIndexableFields();
+      strategy = new AbstractObjectStrategy(nilObject, numElements);
+    }
+
     strategy.setIndexableField((int) index, value);
   }
 
@@ -76,20 +77,58 @@ public class SArray extends SAbstractObject {
     return universe.arrayClass;
   }
 
+  private final SObject nilObject;
   private SArrayStorageStrategy strategy;
 
   private interface SArrayStorageStrategy {
     int getNumberOfIndexableFields();
     SAbstractObject getIndexableField(int index);
     void setIndexableField(int index, SAbstractObject value);
+    boolean shouldStrategyChange(SAbstractObject value);
   }
 
-  private static final class SArrayAbstractObjectStrategy implements SArrayStorageStrategy {
+  private static class EmptyStrategy implements SArrayStorageStrategy {
+
+    private final SObject nilObject;
+    private final int numElements;
+
+    private EmptyStrategy(SObject nilObject, int numElements) {
+      this.nilObject = nilObject;
+      this.numElements = numElements;
+    }
+
+    @Override
+    public int getNumberOfIndexableFields() {
+      return numElements;
+    }
+
+    @Override
+    public SAbstractObject getIndexableField(int index) {
+      return nilObject;
+    }
+
+    @Override
+    public void setIndexableField(int index, SAbstractObject value) {
+      throw new UnsupportedOperationException("Cannot set indexable field on empty strategy.");
+    }
+
+    @Override
+    public boolean shouldStrategyChange(SAbstractObject value) {
+      return value != nilObject;
+    }
+
+  }
+
+  private static final class AbstractObjectStrategy implements SArrayStorageStrategy {
 
     private final SAbstractObject[] indexableFields;
 
-    private SArrayAbstractObjectStrategy(int numElements) {
+    private AbstractObjectStrategy(SObject nilObject, int numElements) {
       indexableFields = new SAbstractObject[numElements];
+
+      for (int i = 0; i < numElements; i++) {
+        indexableFields[i] = nilObject;
+      }
     }
 
     @Override
@@ -105,6 +144,11 @@ public class SArray extends SAbstractObject {
     @Override
     public void setIndexableField(int index, SAbstractObject value) {
       indexableFields[index] = value;
+    }
+
+    @Override
+    public boolean shouldStrategyChange(SAbstractObject value) {
+      return false;
     }
 
   }
