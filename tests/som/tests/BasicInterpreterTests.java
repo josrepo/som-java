@@ -178,13 +178,6 @@ public class BasicInterpreterTests {
       return;
     }
 
-    if (resultType == SClass.class) {
-      String expected = (String) expectedResult;
-      String actual = ((SClass) actualResult).getName().getEmbeddedString();
-      assertEquals(expected, actual);
-      return;
-    }
-
     if (resultType == SSymbol.class) {
       String expected = (String) expectedResult;
       String actual = ((SSymbol) actualResult).getEmbeddedString();
