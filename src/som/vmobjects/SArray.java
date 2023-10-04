@@ -84,7 +84,7 @@ public class SArray extends SAbstractObject {
     void setIndexableField(int index, SAbstractObject value);
   }
 
-  private static class SArrayAbstractObjectStrategy implements SArrayStorageStrategy {
+  private static final class SArrayAbstractObjectStrategy implements SArrayStorageStrategy {
 
     private final SAbstractObject[] indexableFields;
 
