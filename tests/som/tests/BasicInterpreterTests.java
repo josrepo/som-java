@@ -100,6 +100,8 @@ public class BasicInterpreterTests {
         {"Arrays", "testPutDifferentTypes", "[a True]", SArray.class},
         {"Arrays", "testFirstLast", 1, SInteger.class},
         {"Arrays", "testEmpty", 0, SInteger.class},
+        {"Arrays", "testAccessEmpty", "Nil", SClass.class},
+        {"Arrays", "testEmptyToFull", 1, SInteger.class},
 
         {"BlockInlining", "testNoInlining", 1, SInteger.class},
         {"BlockInlining", "testOneLevelInlining", 1, SInteger.class},
