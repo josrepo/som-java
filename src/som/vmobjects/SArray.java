@@ -103,7 +103,9 @@ public class SArray extends SAbstractObject {
 
     @Override
     public void setIndexableField(int index, SAbstractObject value) {
-      throw new UnsupportedOperationException("Cannot set indexable field on empty strategy.");
+      if (value != nilObject) {
+        throw new UnsupportedOperationException("Cannot set indexable field on empty strategy.");
+      }
     }
 
     @Override
