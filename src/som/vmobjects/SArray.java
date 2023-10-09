@@ -78,10 +78,10 @@ public class SArray extends SAbstractObject {
     int getNumberOfIndexableFields();
     SAbstractObject getIndexableField(int index);
     void setIndexableField(int index, SAbstractObject value);
-    SArrayStorageStrategy changeStrategyTo (SAbstractObject value);
+    SArrayStorageStrategy changeStrategyTo(SAbstractObject value);
   }
 
-  private static class EmptyStrategy implements SArrayStorageStrategy {
+  private static final class EmptyStrategy implements SArrayStorageStrategy {
 
     private final SObject nilObject;
     private final int numElements;
