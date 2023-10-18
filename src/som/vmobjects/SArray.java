@@ -38,8 +38,7 @@ public class SArray extends SAbstractObject {
   }
 
   public void setIndexableField(long index, SAbstractObject value) {
-    strategy = strategy.changeStrategyTo(value);
-    strategy.setIndexableField((int) index, value);
+    strategy = strategy.setIndexableFieldMaybeTransition((int) index, value);
   }
 
   public int getNumberOfIndexableFields() {
@@ -77,8 +76,7 @@ public class SArray extends SAbstractObject {
   private interface SArrayStorageStrategy {
     int getNumberOfIndexableFields();
     SAbstractObject getIndexableField(int index);
-    void setIndexableField(int index, SAbstractObject value);
-    SArrayStorageStrategy changeStrategyTo(SAbstractObject value);
+    SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value);
   }
 
   private static final class EmptyStrategy implements SArrayStorageStrategy {
@@ -102,15 +100,14 @@ public class SArray extends SAbstractObject {
     }
 
     @Override
-    public void setIndexableField(int index, SAbstractObject value) {
-      if (value != nilObject) {
-        throw new UnsupportedOperationException("Cannot set indexable field on empty strategy.");
+    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
+      if (value == nilObject) {
+        return this;
       }
-    }
 
-    @Override
-    public SArrayStorageStrategy changeStrategyTo(SAbstractObject value) {
-      return value == nilObject ? this : new AbstractObjectStrategy(nilObject, numElements);
+      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(nilObject, numElements);
+      strategy.setIndexableFieldNoTransition(index, value);
+      return strategy;
     }
 
   }
@@ -138,13 +135,13 @@ public class SArray extends SAbstractObject {
     }
 
     @Override
-    public void setIndexableField(int index, SAbstractObject value) {
+    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
       indexableFields[index] = value;
+      return this;
     }
 
-    @Override
-    public SArrayStorageStrategy changeStrategyTo(SAbstractObject value) {
-      return this;
+    public void setIndexableFieldNoTransition(int index, SAbstractObject value) {
+      indexableFields[index] = value;
     }
 
   }
