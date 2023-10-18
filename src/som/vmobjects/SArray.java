@@ -105,6 +105,16 @@ public class SArray extends SAbstractObject {
         return this;
       }
 
+      if (value instanceof SInteger) { // FIXME: Not a fan of instanceof
+        final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
+
+        if (embeddedInteger != IntegerStrategy.EMPTY_SLOT) {
+          final IntegerStrategy strategy = new IntegerStrategy(numElements);
+          strategy.setIndexableFieldNoTransition(index, embeddedInteger);
+          return strategy;
+        }
+      }
+
       final AbstractObjectStrategy strategy = new AbstractObjectStrategy(nilObject, numElements);
       strategy.setIndexableFieldNoTransition(index, value);
       return strategy;
@@ -121,6 +131,14 @@ public class SArray extends SAbstractObject {
 
       for (int i = 0; i < numElements; i++) {
         indexableFields[i] = nilObject;
+      }
+    }
+
+    private AbstractObjectStrategy(SObject nilObject, long[] elements) {
+      indexableFields = new SAbstractObject[elements.length];
+
+      for (int i = 0; i < elements.length; i++) {
+        indexableFields[i] = elements[i] == IntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
       }
     }
 
@@ -141,6 +159,53 @@ public class SArray extends SAbstractObject {
     }
 
     public void setIndexableFieldNoTransition(int index, SAbstractObject value) {
+      indexableFields[index] = value;
+    }
+
+  }
+
+  private static final class IntegerStrategy implements SArrayStorageStrategy {
+
+    // Magic value used to indicate an empty element
+    // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
+    public static final long EMPTY_SLOT = Long.MIN_VALUE + 2L;
+    private final long[] indexableFields;
+
+    private IntegerStrategy(int numElements) {
+      indexableFields = new long[numElements];
+
+      for (int i = 0; i < numElements; i++) {
+        indexableFields[i] = EMPTY_SLOT;
+      }
+    }
+
+    @Override
+    public int getNumberOfIndexableFields() {
+      return indexableFields.length;
+    }
+
+    @Override
+    public SAbstractObject getIndexableField(int index) {
+      return SInteger.getInteger(indexableFields[index]);
+    }
+
+    @Override
+    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
+      if (value instanceof SInteger) {
+        final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
+
+        if (embeddedInteger != EMPTY_SLOT) {
+          indexableFields[index] = embeddedInteger;
+          return this;
+        }
+      }
+
+      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(Universe.current().nilObject, indexableFields);
+      strategy.setIndexableFieldNoTransition(index, value);
+      return strategy;
+    }
+
+    public void setIndexableFieldNoTransition(int index, long value) {
       indexableFields[index] = value;
     }
 
