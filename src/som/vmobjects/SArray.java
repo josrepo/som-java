@@ -105,12 +105,20 @@ public class SArray extends SAbstractObject {
         return this;
       }
 
-      if (value instanceof SInteger) { // FIXME: Not a fan of instanceof
+      if (value instanceof SInteger) {
         final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
 
         if (embeddedInteger != IntegerStrategy.EMPTY_SLOT) {
           final IntegerStrategy strategy = new IntegerStrategy(numElements);
           strategy.setIndexableFieldNoTransition(index, embeddedInteger);
+          return strategy;
+        }
+      } else if (value instanceof SDouble) {
+        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
+
+        if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
+          final DoubleStrategy strategy = new DoubleStrategy(numElements);
+          strategy.setIndexableFieldNoTransition(index, embeddedDouble);
           return strategy;
         }
       }
@@ -139,6 +147,14 @@ public class SArray extends SAbstractObject {
 
       for (int i = 0; i < elements.length; i++) {
         indexableFields[i] = elements[i] == IntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
+      }
+    }
+
+    private AbstractObjectStrategy(SObject nilObject, double[] elements) {
+      indexableFields = new SAbstractObject[elements.length];
+
+      for (int i = 0; i < elements.length; i++) {
+        indexableFields[i] = elements[i] == DoubleStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
       }
     }
 
@@ -198,6 +214,14 @@ public class SArray extends SAbstractObject {
           indexableFields[index] = embeddedInteger;
           return this;
         }
+      } else if (value instanceof SDouble) {
+        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
+
+        if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
+          final DoubleStrategy strategy = new DoubleStrategy(indexableFields);
+          strategy.setIndexableFieldNoTransition(index, embeddedDouble);
+          return strategy;
+        }
       }
 
       final AbstractObjectStrategy strategy = new AbstractObjectStrategy(Universe.current().nilObject, indexableFields);
@@ -206,6 +230,61 @@ public class SArray extends SAbstractObject {
     }
 
     public void setIndexableFieldNoTransition(int index, long value) {
+      indexableFields[index] = value;
+    }
+
+  }
+
+  private static final class DoubleStrategy implements SArrayStorageStrategy {
+
+    // Magic value used to indicate an empty element
+    // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
+    public static final double EMPTY_SLOT = Double.MIN_VALUE + 2L;
+    private final double[] indexableFields;
+
+    private DoubleStrategy(int numElements) {
+      indexableFields = new double[numElements];
+
+      for (int i = 0; i < numElements; i++) {
+        indexableFields[i] = EMPTY_SLOT;
+      }
+    }
+
+    private DoubleStrategy(long[] indexableFields) {
+      this.indexableFields = new double[indexableFields.length];
+
+      for (int i = 0; i < indexableFields.length; i++) {
+        this.indexableFields[i] = indexableFields[i] == IntegerStrategy.EMPTY_SLOT ? DoubleStrategy.EMPTY_SLOT : (double) indexableFields[i];
+      }
+    }
+
+    @Override
+    public int getNumberOfIndexableFields() {
+      return indexableFields.length;
+    }
+
+    @Override
+    public SAbstractObject getIndexableField(int index) {
+      return new SDouble(indexableFields[index]);
+    }
+
+    @Override
+    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
+      if (value instanceof SDouble) {
+        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
+
+        if (embeddedDouble != EMPTY_SLOT) {
+          indexableFields[index] = embeddedDouble;
+          return this;
+        }
+      }
+
+      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(Universe.current().nilObject, indexableFields);
+      strategy.setIndexableFieldNoTransition(index, value);
+      return strategy;
+    }
+
+    public void setIndexableFieldNoTransition(int index, double value) {
       indexableFields[index] = value;
     }
 
