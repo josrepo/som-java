@@ -40,18 +40,11 @@ import som.compiler.ProgramDefinitionError;
 import som.compiler.SourcecodeCompiler;
 import som.interpreter.Frame;
 import som.interpreter.Interpreter;
-import som.vmobjects.SAbstractObject;
-import som.vmobjects.SArray;
-import som.vmobjects.SBigInteger;
-import som.vmobjects.SBlock;
-import som.vmobjects.SClass;
-import som.vmobjects.SDouble;
-import som.vmobjects.SInteger;
-import som.vmobjects.SInvokable;
-import som.vmobjects.SMethod;
-import som.vmobjects.SObject;
-import som.vmobjects.SString;
-import som.vmobjects.SSymbol;
+import som.vmobjects.*;
+import som.vmobjects.storagestrategies.sarray.AbstractObjectStrategy;
+import som.vmobjects.storagestrategies.sarray.DoubleStrategy;
+import som.vmobjects.storagestrategies.sarray.EmptyStrategy;
+import som.vmobjects.storagestrategies.sarray.IntegerStrategy;
 
 
 public class Universe {
@@ -336,6 +329,11 @@ public class Universe {
     // Allocate the nil object
     nilObject = new SObject(null);
 
+    SArray.emptyStrategy = new EmptyStrategy(nilObject);
+    SArray.abstractObjectStrategy = new AbstractObjectStrategy(nilObject);
+    SArray.integerStrategy = new IntegerStrategy();
+    SArray.doubleStrategy = new DoubleStrategy();
+
     // Allocate the Metaclass classes
     metaclassClass = newMetaclassClass();
 
@@ -425,7 +423,7 @@ public class Universe {
   }
 
   public SArray newArray(final long length) {
-    return new SArray(nilObject, length);
+    return new SArray(length);
   }
 
   public SArray newArray(final List<?> list) {

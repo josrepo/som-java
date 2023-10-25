@@ -193,7 +193,7 @@ public class SystemPrimitives extends Primitives {
           }
         }
 
-        final SArray arr = new SArray(universe.nilObject, 3L);
+        final SArray arr = universe.newArray(3L);
         arr.setIndexableField(0L, SInteger.getInteger(counts));
         arr.setIndexableField(1L, SInteger.getInteger(time));
         arr.setIndexableField(2L, SInteger.getInteger(allocatedBytes));

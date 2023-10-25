@@ -25,24 +25,25 @@
 package som.vmobjects;
 
 import som.vm.Universe;
-
+import som.vmobjects.storagestrategies.sarray.*;
 
 public class SArray extends SAbstractObject {
 
-  public SArray(final SObject nilObject, long numElements) {
-    strategy = new EmptyStrategy(nilObject, (int) numElements);
+  public SArray(long numElements) {
+    strategy = emptyStrategy;
+    emptyStrategy.initialize(this, (int) numElements);
   }
 
   public SAbstractObject getIndexableField(long index) {
-    return strategy.getIndexableField((int) index);
+    return strategy.getIndexableField(this, (int) index);
   }
 
   public void setIndexableField(long index, SAbstractObject value) {
-    strategy = strategy.setIndexableFieldMaybeTransition((int) index, value);
+    strategy = strategy.setIndexableFieldMaybeTransition(this, (int) index, value);
   }
 
   public int getNumberOfIndexableFields() {
-    return strategy.getNumberOfIndexableFields();
+    return strategy.getNumberOfIndexableFields(this);
   }
 
   public SArray copyAndExtendWith(SAbstractObject value, final Universe universe) {
@@ -72,222 +73,11 @@ public class SArray extends SAbstractObject {
   }
 
   private SArrayStorageStrategy strategy;
+  public Object storage;
 
-  private interface SArrayStorageStrategy {
-    int getNumberOfIndexableFields();
-    SAbstractObject getIndexableField(int index);
-    SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value);
-  }
-
-  private static final class EmptyStrategy implements SArrayStorageStrategy {
-
-    private final SObject nilObject;
-    private final int numElements;
-
-    private EmptyStrategy(SObject nilObject, int numElements) {
-      this.nilObject = nilObject;
-      this.numElements = numElements;
-    }
-
-    @Override
-    public int getNumberOfIndexableFields() {
-      return numElements;
-    }
-
-    @Override
-    public SAbstractObject getIndexableField(int index) {
-      return nilObject;
-    }
-
-    @Override
-    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
-      if (value == nilObject) {
-        return this;
-      }
-
-      if (value instanceof SInteger) {
-        final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
-
-        if (embeddedInteger != IntegerStrategy.EMPTY_SLOT) {
-          final IntegerStrategy strategy = new IntegerStrategy(numElements);
-          strategy.setIndexableFieldNoTransition(index, embeddedInteger);
-          return strategy;
-        }
-      } else if (value instanceof SDouble) {
-        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
-
-        if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-          final DoubleStrategy strategy = new DoubleStrategy(numElements);
-          strategy.setIndexableFieldNoTransition(index, embeddedDouble);
-          return strategy;
-        }
-      }
-
-      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(nilObject, numElements);
-      strategy.setIndexableFieldNoTransition(index, value);
-      return strategy;
-    }
-
-  }
-
-  private static final class AbstractObjectStrategy implements SArrayStorageStrategy {
-
-    private final SAbstractObject[] indexableFields;
-
-    private AbstractObjectStrategy(SObject nilObject, int numElements) {
-      indexableFields = new SAbstractObject[numElements];
-
-      for (int i = 0; i < numElements; i++) {
-        indexableFields[i] = nilObject;
-      }
-    }
-
-    private AbstractObjectStrategy(SObject nilObject, long[] elements) {
-      indexableFields = new SAbstractObject[elements.length];
-
-      for (int i = 0; i < elements.length; i++) {
-        indexableFields[i] = elements[i] == IntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
-      }
-    }
-
-    private AbstractObjectStrategy(SObject nilObject, double[] elements) {
-      indexableFields = new SAbstractObject[elements.length];
-
-      for (int i = 0; i < elements.length; i++) {
-        indexableFields[i] = elements[i] == DoubleStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
-      }
-    }
-
-    @Override
-    public int getNumberOfIndexableFields() {
-      return indexableFields.length;
-    }
-
-    @Override
-    public SAbstractObject getIndexableField(int index) {
-      return indexableFields[index];
-    }
-
-    @Override
-    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
-      indexableFields[index] = value;
-      return this;
-    }
-
-    public void setIndexableFieldNoTransition(int index, SAbstractObject value) {
-      indexableFields[index] = value;
-    }
-
-  }
-
-  private static final class IntegerStrategy implements SArrayStorageStrategy {
-
-    // Magic value used to indicate an empty element
-    // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
-    public static final long EMPTY_SLOT = Long.MIN_VALUE + 2L;
-    private final long[] indexableFields;
-
-    private IntegerStrategy(int numElements) {
-      indexableFields = new long[numElements];
-
-      for (int i = 0; i < numElements; i++) {
-        indexableFields[i] = EMPTY_SLOT;
-      }
-    }
-
-    @Override
-    public int getNumberOfIndexableFields() {
-      return indexableFields.length;
-    }
-
-    @Override
-    public SAbstractObject getIndexableField(int index) {
-      return SInteger.getInteger(indexableFields[index]);
-    }
-
-    @Override
-    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
-      if (value instanceof SInteger) {
-        final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
-
-        if (embeddedInteger != EMPTY_SLOT) {
-          indexableFields[index] = embeddedInteger;
-          return this;
-        }
-      } else if (value instanceof SDouble) {
-        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
-
-        if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-          final DoubleStrategy strategy = new DoubleStrategy(indexableFields);
-          strategy.setIndexableFieldNoTransition(index, embeddedDouble);
-          return strategy;
-        }
-      }
-
-      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(Universe.current().nilObject, indexableFields);
-      strategy.setIndexableFieldNoTransition(index, value);
-      return strategy;
-    }
-
-    public void setIndexableFieldNoTransition(int index, long value) {
-      indexableFields[index] = value;
-    }
-
-  }
-
-  private static final class DoubleStrategy implements SArrayStorageStrategy {
-
-    // Magic value used to indicate an empty element
-    // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
-    public static final double EMPTY_SLOT = Double.MIN_VALUE + 2L;
-    private final double[] indexableFields;
-
-    private DoubleStrategy(int numElements) {
-      indexableFields = new double[numElements];
-
-      for (int i = 0; i < numElements; i++) {
-        indexableFields[i] = EMPTY_SLOT;
-      }
-    }
-
-    private DoubleStrategy(long[] indexableFields) {
-      this.indexableFields = new double[indexableFields.length];
-
-      for (int i = 0; i < indexableFields.length; i++) {
-        this.indexableFields[i] = indexableFields[i] == IntegerStrategy.EMPTY_SLOT ? DoubleStrategy.EMPTY_SLOT : (double) indexableFields[i];
-      }
-    }
-
-    @Override
-    public int getNumberOfIndexableFields() {
-      return indexableFields.length;
-    }
-
-    @Override
-    public SAbstractObject getIndexableField(int index) {
-      return new SDouble(indexableFields[index]);
-    }
-
-    @Override
-    public SArrayStorageStrategy setIndexableFieldMaybeTransition(int index, SAbstractObject value) {
-      if (value instanceof SDouble) {
-        final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
-
-        if (embeddedDouble != EMPTY_SLOT) {
-          indexableFields[index] = embeddedDouble;
-          return this;
-        }
-      }
-
-      final AbstractObjectStrategy strategy = new AbstractObjectStrategy(Universe.current().nilObject, indexableFields);
-      strategy.setIndexableFieldNoTransition(index, value);
-      return strategy;
-    }
-
-    public void setIndexableFieldNoTransition(int index, double value) {
-      indexableFields[index] = value;
-    }
-
-  }
+  public static EmptyStrategy emptyStrategy;
+  public static AbstractObjectStrategy abstractObjectStrategy;
+  public static IntegerStrategy integerStrategy;
+  public static DoubleStrategy doubleStrategy;
 
 }
