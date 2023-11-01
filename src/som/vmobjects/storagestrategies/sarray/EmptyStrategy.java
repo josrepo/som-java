@@ -8,7 +8,7 @@ import som.vmobjects.*;
  *
  * Stores the array length as an int
  */
-public class EmptyStrategy implements SArrayStorageStrategy {
+public class EmptyStrategy extends SArrayStorageStrategy {
 
   private final SObject nilObject;
 
@@ -39,27 +39,27 @@ public class EmptyStrategy implements SArrayStorageStrategy {
     if (value instanceof SInteger) {
       final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
 
-      if (embeddedInteger != IntegerStrategy.EMPTY_SLOT) {
-        final IntegerStrategy integerStrategy = Universe.current().getIntegerStrategy();
-        integerStrategy.initialize(arr, (int) arr.storage);
-        integerStrategy.setIndexableFieldNoTransition(arr, index, embeddedInteger);
-        return integerStrategy;
+      if (embeddedInteger != SIntegerStrategy.EMPTY_SLOT) {
+        final SIntegerStrategy sIntegerStrategy = Universe.current().getSIntegerStrategy();
+        sIntegerStrategy.initialize(arr, (int) arr.storage);
+        sIntegerStrategy.setIndexableFieldNoTransition(arr, index, embeddedInteger);
+        return sIntegerStrategy;
       }
     } else if (value instanceof SDouble) {
       final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
 
-      if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-        final DoubleStrategy doubleStrategy = Universe.current().getDoubleStrategy();
-        doubleStrategy.initialize(arr, (int) arr.storage);
-        doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
-        return doubleStrategy;
+      if (embeddedDouble != SDoubleStrategy.EMPTY_SLOT) {
+        final SDoubleStrategy sDoubleStrategy = Universe.current().getSDoubleStrategy();
+        sDoubleStrategy.initialize(arr, (int) arr.storage);
+        sDoubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
+        return sDoubleStrategy;
       }
     }
 
-    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
-    abstractObjectStrategy.initialize(arr, (int) arr.storage);
-    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return abstractObjectStrategy;
+    final SAbstractObjectStrategy sAbstractObjectStrategy = Universe.current().getSAbstractObjectStrategy();
+    sAbstractObjectStrategy.initialize(arr, (int) arr.storage);
+    sAbstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return sAbstractObjectStrategy;
   }
 
 }

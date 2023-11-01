@@ -41,10 +41,10 @@ import som.compiler.SourcecodeCompiler;
 import som.interpreter.Frame;
 import som.interpreter.Interpreter;
 import som.vmobjects.*;
-import som.vmobjects.storagestrategies.sarray.AbstractObjectStrategy;
-import som.vmobjects.storagestrategies.sarray.DoubleStrategy;
+import som.vmobjects.storagestrategies.sarray.SAbstractObjectStrategy;
+import som.vmobjects.storagestrategies.sarray.SDoubleStrategy;
 import som.vmobjects.storagestrategies.sarray.EmptyStrategy;
-import som.vmobjects.storagestrategies.sarray.IntegerStrategy;
+import som.vmobjects.storagestrategies.sarray.SIntegerStrategy;
 
 
 public class Universe {
@@ -330,9 +330,9 @@ public class Universe {
     nilObject = new SObject(null);
 
     emptyStrategy = new EmptyStrategy(nilObject);
-    abstractObjectStrategy = new AbstractObjectStrategy(nilObject);
-    integerStrategy = new IntegerStrategy();
-    doubleStrategy = new DoubleStrategy();
+    sAbstractObjectStrategy = new SAbstractObjectStrategy(nilObject);
+    sIntegerStrategy = new SIntegerStrategy();
+    sDoubleStrategy = new SDoubleStrategy();
 
     // Allocate the Metaclass classes
     metaclassClass = newMetaclassClass();
@@ -718,16 +718,16 @@ public class Universe {
     return emptyStrategy;
   }
 
-  public AbstractObjectStrategy getAbstractObjectStrategy() {
-    return abstractObjectStrategy;
+  public SAbstractObjectStrategy getSAbstractObjectStrategy() {
+    return sAbstractObjectStrategy;
   }
 
-  public IntegerStrategy getIntegerStrategy() {
-    return integerStrategy;
+  public SIntegerStrategy getSIntegerStrategy() {
+    return sIntegerStrategy;
   }
 
-  public DoubleStrategy getDoubleStrategy() {
-    return doubleStrategy;
+  public SDoubleStrategy getSDoubleStrategy() {
+    return sDoubleStrategy;
   }
 
   public static void errorPrint(final String msg) {
@@ -799,9 +799,9 @@ public class Universe {
   private final HashMap<String, SSymbol> symbolTable;
 
   private EmptyStrategy emptyStrategy;
-  private AbstractObjectStrategy abstractObjectStrategy;
-  private IntegerStrategy integerStrategy;
-  private DoubleStrategy doubleStrategy;
+  private SAbstractObjectStrategy sAbstractObjectStrategy;
+  private SIntegerStrategy sIntegerStrategy;
+  private SDoubleStrategy sDoubleStrategy;
 
   // TODO: this is not how it is supposed to be... it is just a hack to cope
   // with the use of system.exit in SOM to enable testing

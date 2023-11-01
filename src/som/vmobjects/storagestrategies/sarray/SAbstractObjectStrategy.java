@@ -9,23 +9,21 @@ import java.util.Arrays;
  *
  * Stores an SAbstractObject[]
  */
-public class AbstractObjectStrategy implements SArrayStorageStrategy {
+public class SAbstractObjectStrategy extends SArrayStorageStrategy {
   private final SObject nilObject;
 
-  public AbstractObjectStrategy(SObject nilObject) {
+  public SAbstractObjectStrategy(SObject nilObject) {
     this.nilObject = nilObject;
   }
   public void initialize(SArray arr, int numElements) {
-    SAbstractObject[] storage = new SAbstractObject[numElements];
-    Arrays.fill(storage, nilObject);
-    arr.storage = storage;
+    initializeAll(arr, nilObject, numElements);
   }
 
   public void initialize(SArray arr, long[] elements) {
     SAbstractObject[] storage = new SAbstractObject[elements.length];
 
     for (int i = 0; i < elements.length; i++) {
-      storage[i] = elements[i] == IntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
+      storage[i] = elements[i] == SIntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
     }
 
     arr.storage = storage;
@@ -35,9 +33,15 @@ public class AbstractObjectStrategy implements SArrayStorageStrategy {
     SAbstractObject[] storage = new SAbstractObject[elements.length];
 
     for (int i = 0; i < elements.length; i++) {
-      storage[i] = elements[i] == DoubleStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
+      storage[i] = elements[i] == SDoubleStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
     }
 
+    arr.storage = storage;
+  }
+
+  public void initializeAll(SArray arr, SAbstractObject value, int numElements) {
+    SAbstractObject[] storage = new SAbstractObject[numElements];
+    Arrays.fill(storage, value);
     arr.storage = storage;
   }
 

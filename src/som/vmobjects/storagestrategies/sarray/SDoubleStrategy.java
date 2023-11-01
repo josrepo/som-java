@@ -12,25 +12,29 @@ import java.util.Arrays;
  *
  * Stores a double[]
  */
-public class DoubleStrategy implements SArrayStorageStrategy {
+public class SDoubleStrategy extends SArrayStorageStrategy {
 
   // Magic value used to indicate an empty element
   // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
   public static final double EMPTY_SLOT = Double.MIN_VALUE + 2L;
 
   public void initialize(SArray arr, int numElements) {
-    double[] storage = new double[numElements];
-    Arrays.fill(storage, EMPTY_SLOT);
-    arr.storage = storage;
+    initializeAll(arr, EMPTY_SLOT, numElements);
   }
 
   public void initialize(SArray arr, long[] elements) {
     double[] storage = new double[elements.length];
 
     for (int i = 0; i < elements.length; i++) {
-      storage[i] = elements[i] == IntegerStrategy.EMPTY_SLOT ? DoubleStrategy.EMPTY_SLOT : (double) elements[i];
+      storage[i] = elements[i] == SIntegerStrategy.EMPTY_SLOT ? SDoubleStrategy.EMPTY_SLOT : (double) elements[i];
     }
 
+    arr.storage = storage;
+  }
+
+  public void initializeAll(SArray arr, double value, int numElements) {
+    double[] storage = new double[numElements];
+    Arrays.fill(storage, value);
     arr.storage = storage;
   }
 
@@ -55,10 +59,10 @@ public class DoubleStrategy implements SArrayStorageStrategy {
       }
     }
 
-    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
-    abstractObjectStrategy.initialize(arr, (double[]) arr.storage);
-    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return abstractObjectStrategy;
+    final SAbstractObjectStrategy sAbstractObjectStrategy = Universe.current().getSAbstractObjectStrategy();
+    sAbstractObjectStrategy.initialize(arr, (double[]) arr.storage);
+    sAbstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return sAbstractObjectStrategy;
   }
 
   public void setIndexableFieldNoTransition(SArray arr, int index, double value) {

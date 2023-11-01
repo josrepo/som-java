@@ -13,15 +13,19 @@ import java.util.Arrays;
  *
  * Stores a long[]
  */
-public class IntegerStrategy implements SArrayStorageStrategy {
+public class SIntegerStrategy extends SArrayStorageStrategy {
 
   // Magic value used to indicate an empty element
   // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
   public static final long EMPTY_SLOT = Long.MIN_VALUE + 2L;
 
   public void initialize(SArray arr, int numElements) {
+    initializeAll(arr, EMPTY_SLOT, numElements);
+  }
+
+  public void initializeAll(SArray arr, long value, int numElements) {
     long[] storage = new long[numElements];
-    Arrays.fill(storage, EMPTY_SLOT);
+    Arrays.fill(storage, value);
     arr.storage = storage;
   }
 
@@ -47,18 +51,18 @@ public class IntegerStrategy implements SArrayStorageStrategy {
     } else if (value instanceof SDouble) {
       final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
 
-      if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-        final DoubleStrategy doubleStrategy = Universe.current().getDoubleStrategy();
-        doubleStrategy.initialize(arr, (long[]) arr.storage);
-        doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
-        return doubleStrategy;
+      if (embeddedDouble != SDoubleStrategy.EMPTY_SLOT) {
+        final SDoubleStrategy SDoubleStrategy = Universe.current().getSDoubleStrategy();
+        SDoubleStrategy.initialize(arr, (long[]) arr.storage);
+        SDoubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
+        return SDoubleStrategy;
       }
     }
 
-    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
-    abstractObjectStrategy.initialize(arr, (long[]) arr.storage);
-    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return abstractObjectStrategy;
+    final SAbstractObjectStrategy sAbstractObjectStrategy = Universe.current().getSAbstractObjectStrategy();
+    sAbstractObjectStrategy.initialize(arr, (long[]) arr.storage);
+    sAbstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return sAbstractObjectStrategy;
   }
 
   public void setIndexableFieldNoTransition(SArray arr, int index, long value) {
