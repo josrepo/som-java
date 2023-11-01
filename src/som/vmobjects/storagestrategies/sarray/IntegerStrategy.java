@@ -1,5 +1,6 @@
 package som.vmobjects.storagestrategies.sarray;
 
+import som.vm.Universe;
 import som.vmobjects.SAbstractObject;
 import som.vmobjects.SArray;
 import som.vmobjects.SDouble;
@@ -47,15 +48,17 @@ public class IntegerStrategy implements SArrayStorageStrategy {
       final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
 
       if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-        SArray.doubleStrategy.initialize(arr, (long[]) arr.storage);
-        SArray.doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
-        return SArray.doubleStrategy;
+        final DoubleStrategy doubleStrategy = Universe.current().getDoubleStrategy();
+        doubleStrategy.initialize(arr, (long[]) arr.storage);
+        doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
+        return doubleStrategy;
       }
     }
 
-    SArray.abstractObjectStrategy.initialize(arr, (long[]) arr.storage);
-    SArray.abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return SArray.abstractObjectStrategy;
+    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
+    abstractObjectStrategy.initialize(arr, (long[]) arr.storage);
+    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return abstractObjectStrategy;
   }
 
   public void setIndexableFieldNoTransition(SArray arr, int index, long value) {

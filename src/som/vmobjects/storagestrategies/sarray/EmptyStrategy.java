@@ -1,5 +1,6 @@
 package som.vmobjects.storagestrategies.sarray;
 
+import som.vm.Universe;
 import som.vmobjects.*;
 
 /**
@@ -39,23 +40,26 @@ public class EmptyStrategy implements SArrayStorageStrategy {
       final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
 
       if (embeddedInteger != IntegerStrategy.EMPTY_SLOT) {
-        SArray.integerStrategy.initialize(arr, (int) arr.storage);
-        SArray.integerStrategy.setIndexableFieldNoTransition(arr, index, embeddedInteger);
-        return SArray.integerStrategy;
+        final IntegerStrategy integerStrategy = Universe.current().getIntegerStrategy();
+        integerStrategy.initialize(arr, (int) arr.storage);
+        integerStrategy.setIndexableFieldNoTransition(arr, index, embeddedInteger);
+        return integerStrategy;
       }
     } else if (value instanceof SDouble) {
       final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
 
       if (embeddedDouble != DoubleStrategy.EMPTY_SLOT) {
-        SArray.doubleStrategy.initialize(arr, (int) arr.storage);
-        SArray.doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
-        return SArray.doubleStrategy;
+        final DoubleStrategy doubleStrategy = Universe.current().getDoubleStrategy();
+        doubleStrategy.initialize(arr, (int) arr.storage);
+        doubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
+        return doubleStrategy;
       }
     }
 
-    SArray.abstractObjectStrategy.initialize(arr, (int) arr.storage);
-    SArray.abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return SArray.abstractObjectStrategy;
+    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
+    abstractObjectStrategy.initialize(arr, (int) arr.storage);
+    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return abstractObjectStrategy;
   }
 
 }

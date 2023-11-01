@@ -1,5 +1,6 @@
 package som.vmobjects.storagestrategies.sarray;
 
+import som.vm.Universe;
 import som.vmobjects.SAbstractObject;
 import som.vmobjects.SArray;
 import som.vmobjects.SDouble;
@@ -54,9 +55,10 @@ public class DoubleStrategy implements SArrayStorageStrategy {
       }
     }
 
-    SArray.abstractObjectStrategy.initialize(arr, (double[]) arr.storage);
-    SArray.abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return SArray.abstractObjectStrategy;
+    final AbstractObjectStrategy abstractObjectStrategy = Universe.current().getAbstractObjectStrategy();
+    abstractObjectStrategy.initialize(arr, (double[]) arr.storage);
+    abstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return abstractObjectStrategy;
   }
 
   public void setIndexableFieldNoTransition(SArray arr, int index, double value) {

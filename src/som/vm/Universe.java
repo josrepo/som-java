@@ -329,10 +329,10 @@ public class Universe {
     // Allocate the nil object
     nilObject = new SObject(null);
 
-    SArray.emptyStrategy = new EmptyStrategy(nilObject);
-    SArray.abstractObjectStrategy = new AbstractObjectStrategy(nilObject);
-    SArray.integerStrategy = new IntegerStrategy();
-    SArray.doubleStrategy = new DoubleStrategy();
+    emptyStrategy = new EmptyStrategy(nilObject);
+    abstractObjectStrategy = new AbstractObjectStrategy(nilObject);
+    integerStrategy = new IntegerStrategy();
+    doubleStrategy = new DoubleStrategy();
 
     // Allocate the Metaclass classes
     metaclassClass = newMetaclassClass();
@@ -714,6 +714,22 @@ public class Universe {
     }
   }
 
+  public EmptyStrategy getEmptyStrategy() {
+    return emptyStrategy;
+  }
+
+  public AbstractObjectStrategy getAbstractObjectStrategy() {
+    return abstractObjectStrategy;
+  }
+
+  public IntegerStrategy getIntegerStrategy() {
+    return integerStrategy;
+  }
+
+  public DoubleStrategy getDoubleStrategy() {
+    return doubleStrategy;
+  }
+
   public static void errorPrint(final String msg) {
     // Checkstyle: stop
     System.err.print(msg);
@@ -781,6 +797,11 @@ public class Universe {
   public static final String             fileSeparator;
   private final Interpreter              interpreter;
   private final HashMap<String, SSymbol> symbolTable;
+
+  private EmptyStrategy emptyStrategy;
+  private AbstractObjectStrategy abstractObjectStrategy;
+  private IntegerStrategy integerStrategy;
+  private DoubleStrategy doubleStrategy;
 
   // TODO: this is not how it is supposed to be... it is just a hack to cope
   // with the use of system.exit in SOM to enable testing

@@ -30,8 +30,8 @@ import som.vmobjects.storagestrategies.sarray.*;
 public class SArray extends SAbstractObject {
 
   public SArray(long numElements) {
-    strategy = emptyStrategy;
-    emptyStrategy.initialize(this, (int) numElements);
+    strategy = Universe.current().getEmptyStrategy();
+    ((EmptyStrategy) strategy).initialize(this, (int) numElements);
   }
 
   public SAbstractObject getIndexableField(long index) {
@@ -74,10 +74,5 @@ public class SArray extends SAbstractObject {
 
   private SArrayStorageStrategy strategy;
   public Object storage;
-
-  public static EmptyStrategy emptyStrategy;
-  public static AbstractObjectStrategy abstractObjectStrategy;
-  public static IntegerStrategy integerStrategy;
-  public static DoubleStrategy doubleStrategy;
 
 }
