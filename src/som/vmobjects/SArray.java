@@ -42,10 +42,6 @@ public class SArray extends SAbstractObject {
     strategy = strategy.setIndexableFieldMaybeTransition(this, (int) index, value);
   }
 
-  public void fillIndexableFields(SAbstractObject value) {
-    strategy = strategy.fillIndexableFieldsAndTransition(this, value, strategy.getNumberOfIndexableFields(this));
-  }
-
   public int getNumberOfIndexableFields() {
     return strategy.getNumberOfIndexableFields(this);
   }

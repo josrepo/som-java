@@ -64,15 +64,6 @@ public class ArrayPrimitives extends Primitives {
       }
     });
 
-//    installInstancePrimitive(new SPrimitive("putAll:", universe) {
-//
-//      public void invoke(final Frame frame, final Interpreter interpreter) {
-//        SAbstractObject value = frame.pop();
-//        SArray self = (SArray) frame.pop();
-//        self.fillIndexableFields(value);
-//      }
-//    });
-
     installClassPrimitive(new SPrimitive("new:", universe) {
 
       public void invoke(final Frame frame, final Interpreter interpreter) {
