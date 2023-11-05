@@ -3,7 +3,6 @@ package som.vmobjects.storagestrategies.sarray;
 import som.vm.Universe;
 import som.vmobjects.SAbstractObject;
 import som.vmobjects.SArray;
-import som.vmobjects.SDouble;
 import som.vmobjects.SInteger;
 
 import java.util.Arrays;
@@ -47,15 +46,6 @@ public class SIntegerStrategy extends SArrayStorageStrategy {
       if (embeddedInteger != EMPTY_SLOT) {
         ((long[]) arr.storage)[index] = embeddedInteger;
         return this;
-      }
-    } else if (value instanceof SDouble) {
-      final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
-
-      if (embeddedDouble != SDoubleStrategy.EMPTY_SLOT) {
-        final SDoubleStrategy SDoubleStrategy = Universe.current().getSDoubleStrategy();
-        SDoubleStrategy.initialize(arr, (long[]) arr.storage);
-        SDoubleStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
-        return SDoubleStrategy;
       }
     }
 
