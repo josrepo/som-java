@@ -348,6 +348,7 @@ public class Universe {
     primitiveClass = newSystemClass();
     stringClass = newSystemClass();
     doubleClass = newSystemClass();
+    vectorClass = newSystemClass();
 
     // Setup the class reference for the nil object
     nilObject.setClass(nilClass);
@@ -364,6 +365,7 @@ public class Universe {
     initializeSystemClass(integerClass, objectClass, "Integer");
     initializeSystemClass(primitiveClass, objectClass, "Primitive");
     initializeSystemClass(doubleClass, objectClass, "Double");
+    initializeSystemClass(vectorClass, objectClass, "Vector");
 
     // Load methods and fields into the system classes
     loadSystemClass(objectClass);
@@ -377,6 +379,7 @@ public class Universe {
     loadSystemClass(primitiveClass);
     loadSystemClass(stringClass);
     loadSystemClass(doubleClass);
+    loadSystemClass(vectorClass);
 
     // Fix up objectClass
     objectClass.setSuperClass(nilObject);
@@ -450,6 +453,10 @@ public class Universe {
 
     // Return the allocated and initialized array
     return result;
+  }
+
+  public SVector newVector(final long length) {
+    return new SVector(length, nilObject);
   }
 
   public SBlock newBlock(final SMethod method, final Frame context, final int arguments)
@@ -669,7 +676,7 @@ public class Universe {
     }
 
     // Load primitives if necessary
-    if (result.hasPrimitives()) {
+    if (result.hasPrimitives() || result.getName().getEmbeddedString().equals("Vector")) {
       result.loadPrimitives();
     }
   }
@@ -784,6 +791,7 @@ public class Universe {
   public SClass systemClass;
   public SClass blockClass;
   public SClass doubleClass;
+  public SClass vectorClass;
 
   public SClass trueClass;
   public SClass falseClass;
