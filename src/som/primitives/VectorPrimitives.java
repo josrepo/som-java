@@ -98,6 +98,22 @@ public class VectorPrimitives extends Primitives {
       }
     });
 
+    installInstancePrimitive(new SPrimitive("isEmpty", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SVector self = (SVector) frame.pop();
+        frame.push(self.isEmpty());
+      }
+    });
+
+    installInstancePrimitive(new SPrimitive("size", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SVector self = (SVector) frame.pop();
+        frame.push(SInteger.getInteger(self.getSize()));
+      }
+    });
+
     installInstancePrimitive(new SPrimitive("capacity", universe) {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {

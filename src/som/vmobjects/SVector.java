@@ -17,7 +17,7 @@ public class SVector extends SObject {
   }
 
   public SAbstractObject getFirstIndexableField() {
-    if (last - first > 0) {
+    if (getSize() > 0) {
       return indexableFields[first];
     } else {
       return Universe.current().nilObject;
@@ -25,7 +25,7 @@ public class SVector extends SObject {
   }
 
   public SAbstractObject getLastIndexableField() {
-    if (last - first > 0) {
+    if (getSize() > 0) {
       return indexableFields[last - 1];
     } else {
       return Universe.current().nilObject;
@@ -81,7 +81,7 @@ public class SVector extends SObject {
     last = newLast;
     first = 1;
 
-    return found ? Universe.current().trueObject : Universe.current().falseObject;
+    return Universe.current().newBoolean(found);
   }
 
   public SAbstractObject removeFirstElement() {
@@ -97,7 +97,7 @@ public class SVector extends SObject {
   }
 
   public SAbstractObject removeLastElement() {
-    if (last - first > 0) {
+    if (getSize() > 0) {
       last--;
       final SAbstractObject value = indexableFields[last];
       indexableFields[last] = Universe.current().nilObject;
@@ -106,6 +106,14 @@ public class SVector extends SObject {
       // TODO: throw error
       return null;
     }
+  }
+
+  public SObject isEmpty() {
+    return Universe.current().newBoolean(first == last);
+  }
+
+  public int getSize() {
+    return last - first;
   }
 
   public int getCapacity() {

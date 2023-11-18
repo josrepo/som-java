@@ -459,6 +459,10 @@ public class Universe {
     return new SVector(length, nilObject);
   }
 
+  public SObject newBoolean(final boolean bool) {
+    return bool ? trueObject : falseObject;
+  }
+
   public SBlock newBlock(final SMethod method, final Frame context, final int arguments)
       throws ProgramDefinitionError {
     // Allocate a new block and set its class to be the block class
