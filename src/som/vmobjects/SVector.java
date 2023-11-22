@@ -4,7 +4,7 @@ import som.vm.Universe;
 
 public class SVector extends SObject {
 
-  public SVector(final long numElements, SObject nilObject) {
+  public SVector(final long numElements, final SObject nilObject) {
     super(3, nilObject);
     indexableFields = new SAbstractObject[(int) numElements];
     first = last = 0;
@@ -16,19 +16,19 @@ public class SVector extends SObject {
     return indexableFields[storeIndex];
   }
 
-  public SAbstractObject getFirstIndexableField() {
+  public SAbstractObject getFirstIndexableField(final SObject nilObject) {
     if (getSize() > 0) {
       return indexableFields[first];
     } else {
-      return Universe.current().nilObject;
+      return nilObject;
     }
   }
 
-  public SAbstractObject getLastIndexableField() {
+  public SAbstractObject getLastIndexableField(final SObject nilObject) {
     if (getSize() > 0) {
       return indexableFields[last - 1];
     } else {
-      return Universe.current().nilObject;
+      return nilObject;
     }
   }
 
@@ -63,7 +63,7 @@ public class SVector extends SObject {
     last++;
   }
 
-  public SObject removeElement(final SAbstractObject element) {
+  public SObject removeElement(final SAbstractObject element, final Universe universe) {
     final SAbstractObject[] newStorage = new SAbstractObject[indexableFields.length];
     int newLast = 1;
     boolean found = false;
@@ -81,13 +81,13 @@ public class SVector extends SObject {
     last = newLast;
     first = 1;
 
-    return Universe.current().newBoolean(found);
+    return universe.newBoolean(found);
   }
 
-  public SAbstractObject removeFirstElement() {
+  public SAbstractObject removeFirstElement(final SObject nilObject) {
     if (last != first) {
       final SAbstractObject value = indexableFields[first];
-      indexableFields[first] = Universe.current().nilObject;
+      indexableFields[first] = nilObject;
       first++;
       return value;
     } else {
@@ -96,11 +96,11 @@ public class SVector extends SObject {
     }
   }
 
-  public SAbstractObject removeLastElement() {
+  public SAbstractObject removeLastElement(final SObject nilObject) {
     if (getSize() > 0) {
       last--;
       final SAbstractObject value = indexableFields[last];
-      indexableFields[last] = Universe.current().nilObject;
+      indexableFields[last] = nilObject;
       return value;
     } else {
       // TODO: throw error
@@ -108,8 +108,15 @@ public class SVector extends SObject {
     }
   }
 
-  public SObject isEmpty() {
-    return Universe.current().newBoolean(first == last);
+//  public void doBlock(final SBlock block, final Universe universe) {
+//    for (int i = first; i < last; i++) {
+//      final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(1, universe);
+//      eval.invoke(block.getContext(), universe.getInterpreter());
+//    }
+//  }
+
+  public SObject isEmpty(final Universe universe) {
+    return universe.newBoolean(first == last);
   }
 
   public int getSize() {
@@ -118,6 +125,14 @@ public class SVector extends SObject {
 
   public int getCapacity() {
     return indexableFields.length;
+  }
+
+  public int getFirstIndex() {
+    return first;
+  }
+
+  public int getLastIndex() {
+    return last;
   }
 
   @Override

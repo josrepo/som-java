@@ -4,6 +4,7 @@ import som.interpreter.Frame;
 import som.interpreter.Interpreter;
 import som.vm.Universe;
 import som.vmobjects.SAbstractObject;
+import som.vmobjects.SBlock;
 import som.vmobjects.SInteger;
 import som.vmobjects.SPrimitive;
 import som.vmobjects.SVector;
@@ -58,7 +59,7 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.getFirstIndexableField());
+        frame.push(self.getFirstIndexableField(universe.nilObject));
       }
     });
 
@@ -66,17 +67,32 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.getLastIndexableField());
+        frame.push(self.getLastIndexableField(universe.nilObject));
       }
     });
 
-    // do:
+    installInstancePrimitive(new SPrimitive("do:", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SBlock block = (SBlock) frame.pop();
+        SVector self = (SVector) frame.pop();
+        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
+
+        frame.push(block);
+
+        for (int i = self.getFirstIndex(); i < self.getLastIndex() - 1; i++) {
+          frame.push(self.getIndexableField(i));
+          eval.invoke(frame, universe.getInterpreter());
+          frame.pop();
+        }
+      }
+    });
 
     installInstancePrimitive(new SPrimitive("remove", universe) {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeLastElement());
+        frame.push(self.removeLastElement(universe.nilObject));
       }
     });
 
@@ -85,7 +101,7 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SAbstractObject object = frame.pop();
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeElement(object));
+        frame.push(self.removeElement(object, universe));
       }
     });
 
@@ -102,7 +118,7 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.isEmpty());
+        frame.push(self.isEmpty(universe));
       }
     });
 
@@ -122,11 +138,25 @@ public class VectorPrimitives extends Primitives {
       }
     });
 
+//    installInstancePrimitive(new SPrimitive("asArray", universe) {
+//      @Override
+//      public void invoke(Frame frame, Interpreter interpreter) {
+//
+//      }
+//    });
+
+//    installInstancePrimitive(new SPrimitive("asSet", universe) {
+//      @Override
+//      public void invoke(Frame frame, Interpreter interpreter) {
+//
+//      }
+//    });
+
     installInstancePrimitive(new SPrimitive("removeFirst", universe) {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeFirstElement());
+        frame.push(self.removeFirstElement(universe.nilObject));
       }
     });
   }
