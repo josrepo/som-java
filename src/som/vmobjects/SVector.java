@@ -7,18 +7,18 @@ public class SVector extends SObject {
   public SVector(final long numElements, final SObject nilObject) {
     super(3, nilObject);
     indexableFields = new SAbstractObject[(int) numElements];
-    first = last = 0;
+    first = last = 1;
   }
 
   public SAbstractObject getIndexableField(final long index) {
-    final int storeIndex = (int) index + first;
+    final int storeIndex = (int) index + first - 1;
     // TODO: checkIndex
-    return indexableFields[storeIndex];
+    return indexableFields[storeIndex - 1];
   }
 
   public SAbstractObject getFirstIndexableField(final SObject nilObject) {
     if (getSize() > 0) {
-      return indexableFields[first];
+      return indexableFields[first - 1];
     } else {
       return nilObject;
     }
@@ -26,7 +26,7 @@ public class SVector extends SObject {
 
   public SAbstractObject getLastIndexableField(final SObject nilObject) {
     if (getSize() > 0) {
-      return indexableFields[last - 1];
+      return indexableFields[last - 2];
     } else {
       return nilObject;
     }
@@ -35,7 +35,7 @@ public class SVector extends SObject {
   public int getIndexOfElement(final SAbstractObject element) {
     for (int i = 0; i < indexableFields.length; i++) {
       if (indexableFields[i] == element) {
-        return i - first;
+        return i + 2 - first;
       }
     }
 
@@ -43,23 +43,19 @@ public class SVector extends SObject {
   }
 
   public void setIndexableField(final long index, final SAbstractObject value) {
-    final int storeIndex = (int) index + first;
+    final int storeIndex = (int) index + first - 1;
     // TODO: checkIndex
-    indexableFields[storeIndex] = value;
+    indexableFields[storeIndex - 1] = value;
   }
 
   public void setLastIndexableField(final SAbstractObject value) {
-    if (last >= indexableFields.length) {
+    if (last > indexableFields.length) {
       final SAbstractObject[] newStorage = new SAbstractObject[2 * indexableFields.length];
-
-      for (int i = 0; i < indexableFields.length; i++) {
-        newStorage[i] = indexableFields[i];
-      }
-
+      System.arraycopy(indexableFields, 0, newStorage, 0, indexableFields.length);
       indexableFields = newStorage;
     }
 
-    indexableFields[last] = value;
+    indexableFields[last - 1] = value;
     last++;
   }
 
@@ -86,8 +82,8 @@ public class SVector extends SObject {
 
   public SAbstractObject removeFirstElement(final SObject nilObject) {
     if (last != first) {
-      final SAbstractObject value = indexableFields[first];
-      indexableFields[first] = nilObject;
+      final SAbstractObject value = indexableFields[first - 1];
+      indexableFields[first - 1] = nilObject;
       first++;
       return value;
     } else {
@@ -100,8 +96,8 @@ public class SVector extends SObject {
   public SAbstractObject removeLastElement(final SObject nilObject) {
     if (getSize() > 0) {
       last--;
-      final SAbstractObject value = indexableFields[last];
-      indexableFields[last] = nilObject;
+      final SAbstractObject value = indexableFields[last - 1];
+      indexableFields[last - 1] = nilObject;
       return value;
     } else {
       // TODO: throw error
@@ -133,7 +129,7 @@ public class SVector extends SObject {
   public SArray asArray() {
     final SArray arr = new SArray(getSize());
     for (int i = 0; i < getSize(); i++) {
-      arr.setIndexableField(i, indexableFields[first + i]);
+      arr.setIndexableField(i, indexableFields[first + i - 1]);
     }
     return arr;
   }

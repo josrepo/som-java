@@ -41,7 +41,7 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SInteger index = (SInteger) frame.pop();
         SVector self = (SVector) frame.pop();
-        frame.push(self.getIndexableField(index.getEmbeddedInteger() - 1));
+        frame.push(self.getIndexableField(index.getEmbeddedInteger()));
       }
     });
 
@@ -51,7 +51,7 @@ public class VectorPrimitives extends Primitives {
         SAbstractObject value = frame.pop();
         SInteger index = (SInteger) frame.pop();
         SVector self = (SVector) frame.getStackElement(0);
-        self.setIndexableField(index.getEmbeddedInteger() - 1, value);
+        self.setIndexableField(index.getEmbeddedInteger(), value);
       }
     });
 
@@ -97,11 +97,16 @@ public class VectorPrimitives extends Primitives {
         final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
         frame.push(block);
 
-        for (int i = 0; i < self.getLastIndex() - self.getFirstIndex(); i++) {
-          frame.push(self.getIndexableField(i));
+        for (int i = 1; i <= self.getLastIndex() - self.getFirstIndex(); i++) {
+          frame.push(SInteger.getInteger(i));
           eval.invoke(frame, universe.getInterpreter());
           frame.pop();
         }
+//
+//        // send to: last - first do: block
+
+//        SInteger.getInteger(1).send("to:", new SAbstractObject[] {SInteger.getInteger(self.getLastIndex() - self.getFirstIndex())}, universe, universe.getInterpreter());
+//        frame.pop().send("do:", new SAbstractObject[]{block}, universe, universe.getInterpreter());
       }
     });
 
@@ -127,11 +132,7 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SAbstractObject object = frame.pop();
         SVector self = (SVector) frame.pop();
-        int i = self.getIndexOfElement(object);
-        if (i != - 1) {
-          i++;
-        }
-        frame.push(SInteger.getInteger(i));
+        frame.push(SInteger.getInteger(self.getIndexOfElement(object)));
       }
     });
 
