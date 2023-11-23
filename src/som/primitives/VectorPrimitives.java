@@ -76,11 +76,28 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SBlock block = (SBlock) frame.pop();
         SVector self = (SVector) frame.pop();
-        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
 
+        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
         frame.push(block);
 
         for (int i = self.getFirstIndex(); i < self.getLastIndex() - 1; i++) {
+          frame.push(self.getIndexableField(i));
+          eval.invoke(frame, universe.getInterpreter());
+          frame.pop();
+        }
+      }
+    });
+
+    installInstancePrimitive(new SPrimitive("doIndexes:", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SBlock block = (SBlock) frame.pop();
+        SVector self = (SVector) frame.pop();
+
+        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
+        frame.push(block);
+
+        for (int i = 0; i < self.getLastIndex() - self.getFirstIndex(); i++) {
           frame.push(self.getIndexableField(i));
           eval.invoke(frame, universe.getInterpreter());
           frame.pop();
@@ -138,19 +155,13 @@ public class VectorPrimitives extends Primitives {
       }
     });
 
-//    installInstancePrimitive(new SPrimitive("asArray", universe) {
-//      @Override
-//      public void invoke(Frame frame, Interpreter interpreter) {
-//
-//      }
-//    });
-
-//    installInstancePrimitive(new SPrimitive("asSet", universe) {
-//      @Override
-//      public void invoke(Frame frame, Interpreter interpreter) {
-//
-//      }
-//    });
+    installInstancePrimitive(new SPrimitive("asArray", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SVector self = (SVector) frame.pop();
+        frame.push(self.asArray());
+      }
+    });
 
     installInstancePrimitive(new SPrimitive("removeFirst", universe) {
       @Override

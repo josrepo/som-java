@@ -92,6 +92,7 @@ public class SVector extends SObject {
       return value;
     } else {
       // TODO: throw error
+      System.out.println("FAILING ON REMOVE FIRST ELEMENT");
       return null;
     }
   }
@@ -104,16 +105,10 @@ public class SVector extends SObject {
       return value;
     } else {
       // TODO: throw error
+      System.out.println("FAILING ON REMOVE LAST ELEMENT");
       return null;
     }
   }
-
-//  public void doBlock(final SBlock block, final Universe universe) {
-//    for (int i = first; i < last; i++) {
-//      final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(1, universe);
-//      eval.invoke(block.getContext(), universe.getInterpreter());
-//    }
-//  }
 
   public SObject isEmpty(final Universe universe) {
     return universe.newBoolean(first == last);
@@ -133,6 +128,14 @@ public class SVector extends SObject {
 
   public int getLastIndex() {
     return last;
+  }
+
+  public SArray asArray() {
+    final SArray arr = new SArray(indexableFields.length);
+    for (int i = 0; i < indexableFields.length; i++) {
+      arr.setIndexableField(i, indexableFields[i]);
+    }
+    return arr;
   }
 
   @Override
