@@ -131,8 +131,8 @@ public class SVector extends SObject {
   }
 
   public SArray asArray() {
-    final SArray arr = new SArray(indexableFields.length);
-    for (int i = 0; i < indexableFields.length; i++) {
+    final SArray arr = new SArray(getSize());
+    for (int i = first; i < last - 1; i++) {
       arr.setIndexableField(i, indexableFields[i]);
     }
     return arr;

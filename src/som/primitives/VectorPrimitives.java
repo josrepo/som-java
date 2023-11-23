@@ -127,7 +127,11 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SAbstractObject object = frame.pop();
         SVector self = (SVector) frame.pop();
-        frame.push(SInteger.getInteger(self.getIndexOfElement(object) + 1));
+        int i = self.getIndexOfElement(object);
+        if (i != - 1) {
+          i++;
+        }
+        frame.push(SInteger.getInteger(i));
       }
     });
 
