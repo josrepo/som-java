@@ -68,7 +68,7 @@ public class SVector extends SObject {
     int newLast = 1;
     boolean found = false;
 
-    for (int i = 0; i < indexableFields.length; i++) {
+    for (int i = first; i < last; i++) {
       if (indexableFields[i] == element) {
         found = true;
       } else {
