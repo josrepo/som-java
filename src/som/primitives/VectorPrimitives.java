@@ -93,20 +93,7 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SBlock block = (SBlock) frame.pop();
         SVector self = (SVector) frame.pop();
-
-        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
-        frame.push(block);
-
-        for (int i = 1; i <= self.getLastIndex() - self.getFirstIndex(); i++) {
-          frame.push(SInteger.getInteger(i));
-          eval.invoke(frame, universe.getInterpreter());
-          frame.pop();
-        }
-//
-//        // send to: last - first do: block
-
-//        SInteger.getInteger(1).send("to:", new SAbstractObject[] {SInteger.getInteger(self.getLastIndex() - self.getFirstIndex())}, universe, universe.getInterpreter());
-//        frame.pop().send("do:", new SAbstractObject[]{block}, universe, universe.getInterpreter());
+        SInteger.getInteger(1).send("to:do:", new SAbstractObject[] {SInteger.getInteger(self.getLastIndex() - self.getFirstIndex()), block}, universe, universe.getInterpreter());
       }
     });
 
