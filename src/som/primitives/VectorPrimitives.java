@@ -3,11 +3,9 @@ package som.primitives;
 import som.interpreter.Frame;
 import som.interpreter.Interpreter;
 import som.vm.Universe;
-import som.vmobjects.SAbstractObject;
-import som.vmobjects.SBlock;
-import som.vmobjects.SInteger;
-import som.vmobjects.SPrimitive;
-import som.vmobjects.SVector;
+import som.vmobjects.*;
+
+import java.util.ArrayList;
 
 public class VectorPrimitives extends Primitives {
 
@@ -77,13 +75,8 @@ public class VectorPrimitives extends Primitives {
         SBlock block = (SBlock) frame.pop();
         SVector self = (SVector) frame.pop();
 
-        final SBlock.Evaluation eval = (SBlock.Evaluation) SBlock.getEvaluationPrimitive(block.getMethod().getNumberOfArguments(), universe);
-        frame.push(block);
-
-        for (int i = self.getFirstIndex(); i < self.getLastIndex() - 1; i++) {
-          frame.push(self.getIndexableField(i));
-          eval.invoke(frame, universe.getInterpreter());
-          frame.pop();
+        for (int i = self.getLastIndex() - 1; i >= self.getFirstIndex(); i--) {
+          block.send("value:", new SAbstractObject[] {self.getIndexableField(i)}, universe, universe.getInterpreter());
         }
       }
     });
