@@ -121,8 +121,6 @@ public class SVector extends SObject {
       first++;
       return value == null ? nilObject : value;
     } else {
-      // TODO: throw error
-      System.out.println("FAILING ON REMOVE FIRST ELEMENT");
       return null;
     }
   }
@@ -134,8 +132,6 @@ public class SVector extends SObject {
       indexableFields[last - 1] = nilObject;
       return value == null ? nilObject : value;
     } else {
-      // TODO: throw error
-      System.out.println("FAILING ON REMOVE LAST ELEMENT");
       return null;
     }
   }

@@ -102,7 +102,13 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeLastElement(universe.nilObject));
+        SAbstractObject value = self.removeLastElement(universe.nilObject);
+        if (value == null) {
+          SString error = new SString("Vector: Attempting to remove the last element from an empty Vector");
+          self.send("error", new SAbstractObject[] {error}, universe, universe.getInterpreter());
+        } else {
+          frame.push(value);
+        }
       }
     });
 
@@ -169,7 +175,13 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeFirstElement(universe.nilObject));
+        SAbstractObject value = self.removeFirstElement(universe.nilObject);
+        if (value == null) {
+          SString error = new SString("Vector: Attempting to remove the first element from an empty Vector");
+          self.send("error", new SAbstractObject[] {error}, universe, universe.getInterpreter());
+        } else {
+          frame.push(value);
+        }
       }
     });
   }
