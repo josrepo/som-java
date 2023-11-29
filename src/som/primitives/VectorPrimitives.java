@@ -5,8 +5,6 @@ import som.interpreter.Interpreter;
 import som.vm.Universe;
 import som.vmobjects.*;
 
-import java.util.ArrayList;
-
 public class VectorPrimitives extends Primitives {
 
   public VectorPrimitives(final Universe universe) {
@@ -103,7 +101,16 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SAbstractObject object = frame.pop();
         SVector self = (SVector) frame.pop();
-        frame.push(self.removeElement(object, universe));
+        frame.push(universe.newBoolean(self.removeElement(object)));
+      }
+    });
+
+    installInstancePrimitive(new SPrimitive("contains:", universe) {
+      @Override
+      public void invoke(Frame frame, Interpreter interpreter) {
+        SAbstractObject object = frame.pop();
+        SVector self = (SVector) frame.pop();
+        frame.push(universe.newBoolean(self.containsElement(object)));
       }
     });
 
@@ -120,7 +127,7 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.isEmpty(universe));
+        frame.push(universe.newBoolean(self.isEmpty()));
       }
     });
 

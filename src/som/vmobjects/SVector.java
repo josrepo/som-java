@@ -1,5 +1,6 @@
 package som.vmobjects;
 
+import som.interpreter.Interpreter;
 import som.vm.Universe;
 
 public class SVector extends SObject {
@@ -42,6 +43,25 @@ public class SVector extends SObject {
     return -1;
   }
 
+  public boolean containsElement(final SAbstractObject element) {
+    if (element instanceof SString) {
+      final String elementString = ((SString) element).getEmbeddedString();
+      for (int i = first; i <= last - 1; i++) {
+        if (indexableFields[i - 1] instanceof SString && elementString.equals(((SString) indexableFields[i - 1]).getEmbeddedString())) {
+          return true;
+        }
+      }
+    } else {
+      for (int i = first; i <= last - 1; i++) {
+        if (indexableFields[i - 1] == element) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   public void setIndexableField(final long index, final SAbstractObject value) {
     final int storeIndex = (int) index + first - 1;
     // TODO: checkIndex
@@ -59,7 +79,7 @@ public class SVector extends SObject {
     last++;
   }
 
-  public SObject removeElement(final SAbstractObject element, final Universe universe) {
+  public boolean removeElement(final SAbstractObject element) {
     final SAbstractObject[] newStorage = new SAbstractObject[indexableFields.length];
     int newLast = 1;
     boolean found = false;
@@ -77,7 +97,7 @@ public class SVector extends SObject {
     last = newLast;
     first = 1;
 
-    return universe.newBoolean(found);
+    return found;
   }
 
   public SAbstractObject removeFirstElement(final SObject nilObject) {
@@ -106,8 +126,8 @@ public class SVector extends SObject {
     }
   }
 
-  public SObject isEmpty(final Universe universe) {
-    return universe.newBoolean(first == last);
+  public boolean isEmpty() {
+    return first == last;
   }
 
   public int getSize() {
