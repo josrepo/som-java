@@ -167,7 +167,7 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SVector self = (SVector) frame.pop();
-        frame.push(self.asArray());
+        frame.push(self.asArray(universe.nilObject));
       }
     });
 

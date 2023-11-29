@@ -160,10 +160,15 @@ public class SVector extends SObject {
     return last;
   }
 
-  public SArray asArray() {
+  public SArray asArray(final SObject nilObject) {
     final SArray arr = new SArray(getSize());
     for (int i = 0; i < getSize(); i++) {
-      arr.setIndexableField(i, indexableFields[first + i - 1]); // FIXME: indexes wrong? Also doesn't set nilObject?
+      SAbstractObject value = indexableFields[first + i - 1];
+      if (value == null) {
+        arr.setIndexableField(i, nilObject);
+      } else {
+        arr.setIndexableField(i, value);
+      }
     }
     return arr;
   }
