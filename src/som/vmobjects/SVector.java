@@ -1,7 +1,7 @@
 package som.vmobjects;
 
-import som.interpreter.Interpreter;
 import som.vm.Universe;
+
 
 public class SVector extends SObject {
 
@@ -11,10 +11,18 @@ public class SVector extends SObject {
     first = last = 1;
   }
 
-  public SAbstractObject getIndexableField(final long index) {
+  public SAbstractObject getIndexableField(final long index, final SObject nilObject) {
     final int storeIndex = (int) index + first - 1;
-    // TODO: checkIndex
-    return indexableFields[storeIndex - 1];
+
+    if (invalidIndex(storeIndex)) {
+      return null;
+    }
+
+    if (indexableFields[storeIndex - 1] == null) {
+      return nilObject;
+    } else {
+      return indexableFields[storeIndex - 1];
+    }
   }
 
   public SAbstractObject getFirstIndexableField(final SObject nilObject) {
@@ -62,10 +70,16 @@ public class SVector extends SObject {
     return false;
   }
 
-  public void setIndexableField(final long index, final SAbstractObject value) {
+  public boolean setIndexableField(final long index, final SAbstractObject value) {
     final int storeIndex = (int) index + first - 1;
-    // TODO: checkIndex
+
+    if (invalidIndex(storeIndex)) {
+      return false;
+    }
+
     indexableFields[storeIndex - 1] = value;
+
+    return true;
   }
 
   public void setLastIndexableField(final SAbstractObject value) {
@@ -105,7 +119,7 @@ public class SVector extends SObject {
       final SAbstractObject value = indexableFields[first - 1];
       indexableFields[first - 1] = nilObject;
       first++;
-      return value;
+      return value == null ? nilObject : value;
     } else {
       // TODO: throw error
       System.out.println("FAILING ON REMOVE FIRST ELEMENT");
@@ -118,12 +132,16 @@ public class SVector extends SObject {
       last--;
       final SAbstractObject value = indexableFields[last - 1];
       indexableFields[last - 1] = nilObject;
-      return value;
+      return value == null ? nilObject : value;
     } else {
       // TODO: throw error
       System.out.println("FAILING ON REMOVE LAST ELEMENT");
       return null;
     }
+  }
+
+  public boolean invalidIndex(final long index) {
+    return first > index || index >= last;
   }
 
   public boolean isEmpty() {
@@ -149,7 +167,7 @@ public class SVector extends SObject {
   public SArray asArray() {
     final SArray arr = new SArray(getSize());
     for (int i = 0; i < getSize(); i++) {
-      arr.setIndexableField(i, indexableFields[first + i - 1]);
+      arr.setIndexableField(i, indexableFields[first + i - 1]); // FIXME: indexes wrong? Also doesn't set nilObject?
     }
     return arr;
   }

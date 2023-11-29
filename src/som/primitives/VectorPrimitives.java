@@ -37,7 +37,14 @@ public class VectorPrimitives extends Primitives {
       public void invoke(Frame frame, Interpreter interpreter) {
         SInteger index = (SInteger) frame.pop();
         SVector self = (SVector) frame.pop();
-        frame.push(self.getIndexableField(index.getEmbeddedInteger()));
+        SAbstractObject value = self.getIndexableField(index.getEmbeddedInteger(), universe.nilObject);
+        if (value == null) {
+          SString error = new SString("Vector[" + self.getFirstIndex() + ".." + self.getLastIndex() + "]: Index " + index.getEmbeddedInteger() + " out of bounds");
+          self.send("error", new SAbstractObject[] {error}, universe, universe.getInterpreter());
+        }
+        else {
+          frame.push(value);
+        }
       }
     });
 
@@ -47,7 +54,10 @@ public class VectorPrimitives extends Primitives {
         SAbstractObject value = frame.pop();
         SInteger index = (SInteger) frame.pop();
         SVector self = (SVector) frame.getStackElement(0);
-        self.setIndexableField(index.getEmbeddedInteger(), value);
+        if (!self.setIndexableField(index.getEmbeddedInteger(), value)) {
+          SString error = new SString("Vector[" + self.getFirstIndex() + ".." + self.getLastIndex() + "]: Index " + index.getEmbeddedInteger() + " out of bounds");
+          self.send("error", new SAbstractObject[] {error}, universe, universe.getInterpreter());
+        }
       }
     });
 
@@ -74,7 +84,7 @@ public class VectorPrimitives extends Primitives {
         SVector self = (SVector) frame.pop();
 
         for (int i = self.getLastIndex() - 1; i >= self.getFirstIndex(); i--) {
-          block.send("value:", new SAbstractObject[] {self.getIndexableField(i)}, universe, universe.getInterpreter());
+          block.send("value:", new SAbstractObject[] {self.getIndexableField(i, universe.nilObject)}, universe, universe.getInterpreter());
         }
       }
     });
