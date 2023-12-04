@@ -31,7 +31,7 @@ public class SArray extends SAbstractObject {
 
   public SArray(long numElements) {
     strategy = Universe.current().getEmptyStrategy();
-    ((EmptyStrategy) strategy).initialize(this, (int) numElements);
+    ((EmptyArrayStrategy) strategy).initialize(this, (int) numElements);
   }
 
   public SAbstractObject getIndexableField(long index) {
@@ -72,7 +72,7 @@ public class SArray extends SAbstractObject {
     return universe.arrayClass;
   }
 
-  private SArrayStorageStrategy strategy;
+  private ArrayStorageStrategy strategy;
   public Object storage;
 
 }

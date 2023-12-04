@@ -9,10 +9,10 @@ import java.util.Arrays;
  *
  * Stores an SAbstractObject[]
  */
-public class SAbstractObjectStrategy extends SArrayStorageStrategy {
+public class AbstractObjectArrayStrategy extends ArrayStorageStrategy {
   private final SObject nilObject;
 
-  public SAbstractObjectStrategy(SObject nilObject) {
+  public AbstractObjectArrayStrategy(SObject nilObject) {
     this.nilObject = nilObject;
   }
   public void initialize(SArray arr, int numElements) {
@@ -23,7 +23,7 @@ public class SAbstractObjectStrategy extends SArrayStorageStrategy {
     SAbstractObject[] storage = new SAbstractObject[elements.length];
 
     for (int i = 0; i < elements.length; i++) {
-      storage[i] = elements[i] == SIntegerStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
+      storage[i] = elements[i] == IntegerArrayStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
     }
 
     arr.storage = storage;
@@ -33,7 +33,7 @@ public class SAbstractObjectStrategy extends SArrayStorageStrategy {
     SAbstractObject[] storage = new SAbstractObject[elements.length];
 
     for (int i = 0; i < elements.length; i++) {
-      storage[i] = elements[i] == SDoubleStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
+      storage[i] = elements[i] == DoubleArrayStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
     }
 
     arr.storage = storage;
@@ -56,7 +56,7 @@ public class SAbstractObjectStrategy extends SArrayStorageStrategy {
   }
 
   @Override
-  public SArrayStorageStrategy setIndexableFieldMaybeTransition(SArray arr, int index, SAbstractObject value) {
+  public ArrayStorageStrategy setIndexableFieldMaybeTransition(SArray arr, int index, SAbstractObject value) {
     ((SAbstractObject[]) arr.storage)[index] = value;
     return this;
   }

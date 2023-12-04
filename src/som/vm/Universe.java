@@ -41,10 +41,10 @@ import som.compiler.SourcecodeCompiler;
 import som.interpreter.Frame;
 import som.interpreter.Interpreter;
 import som.vmobjects.*;
-import som.vmobjects.storagestrategies.sarray.SAbstractObjectStrategy;
-import som.vmobjects.storagestrategies.sarray.SDoubleStrategy;
-import som.vmobjects.storagestrategies.sarray.EmptyStrategy;
-import som.vmobjects.storagestrategies.sarray.SIntegerStrategy;
+import som.vmobjects.storagestrategies.sarray.AbstractObjectArrayStrategy;
+import som.vmobjects.storagestrategies.sarray.DoubleArrayStrategy;
+import som.vmobjects.storagestrategies.sarray.EmptyArrayStrategy;
+import som.vmobjects.storagestrategies.sarray.IntegerArrayStrategy;
 
 
 public class Universe {
@@ -329,10 +329,10 @@ public class Universe {
     // Allocate the nil object
     nilObject = new SObject(null);
 
-    emptyStrategy = new EmptyStrategy(nilObject);
-    sAbstractObjectStrategy = new SAbstractObjectStrategy(nilObject);
-    sIntegerStrategy = new SIntegerStrategy();
-    sDoubleStrategy = new SDoubleStrategy();
+    emptyArrayStrategy = new EmptyArrayStrategy(nilObject);
+    abstractObjectArrayStrategy = new AbstractObjectArrayStrategy(nilObject);
+    sIntegerArrayStrategy = new IntegerArrayStrategy();
+    sDoubleArrayStrategy = new DoubleArrayStrategy();
 
     // Allocate the Metaclass classes
     metaclassClass = newMetaclassClass();
@@ -725,20 +725,20 @@ public class Universe {
     }
   }
 
-  public EmptyStrategy getEmptyStrategy() {
-    return emptyStrategy;
+  public EmptyArrayStrategy getEmptyStrategy() {
+    return emptyArrayStrategy;
   }
 
-  public SAbstractObjectStrategy getSAbstractObjectStrategy() {
-    return sAbstractObjectStrategy;
+  public AbstractObjectArrayStrategy getSAbstractObjectStrategy() {
+    return abstractObjectArrayStrategy;
   }
 
-  public SIntegerStrategy getSIntegerStrategy() {
-    return sIntegerStrategy;
+  public IntegerArrayStrategy getSIntegerStrategy() {
+    return sIntegerArrayStrategy;
   }
 
-  public SDoubleStrategy getSDoubleStrategy() {
-    return sDoubleStrategy;
+  public DoubleArrayStrategy getSDoubleStrategy() {
+    return sDoubleArrayStrategy;
   }
 
   public static void errorPrint(final String msg) {
@@ -810,10 +810,10 @@ public class Universe {
   private final Interpreter              interpreter;
   private final HashMap<String, SSymbol> symbolTable;
 
-  private EmptyStrategy emptyStrategy;
-  private SAbstractObjectStrategy sAbstractObjectStrategy;
-  private SIntegerStrategy sIntegerStrategy;
-  private SDoubleStrategy sDoubleStrategy;
+  private EmptyArrayStrategy emptyArrayStrategy;
+  private AbstractObjectArrayStrategy abstractObjectArrayStrategy;
+  private IntegerArrayStrategy sIntegerArrayStrategy;
+  private DoubleArrayStrategy sDoubleArrayStrategy;
 
   // TODO: this is not how it is supposed to be... it is just a hack to cope
   // with the use of system.exit in SOM to enable testing

@@ -12,7 +12,7 @@ import java.util.Arrays;
  *
  * Stores a long[]
  */
-public class SIntegerStrategy extends SArrayStorageStrategy {
+public class IntegerArrayStrategy extends ArrayStorageStrategy {
 
   // Magic value used to indicate an empty element
   // Array is transitioned to an AbstractObjectStrategy if the magic value is ever inserted
@@ -39,7 +39,7 @@ public class SIntegerStrategy extends SArrayStorageStrategy {
   }
 
   @Override
-  public SArrayStorageStrategy setIndexableFieldMaybeTransition(SArray arr, int index, SAbstractObject value) {
+  public ArrayStorageStrategy setIndexableFieldMaybeTransition(SArray arr, int index, SAbstractObject value) {
     if (value instanceof SInteger) {
       final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
 
@@ -49,10 +49,10 @@ public class SIntegerStrategy extends SArrayStorageStrategy {
       }
     }
 
-    final SAbstractObjectStrategy sAbstractObjectStrategy = Universe.current().getSAbstractObjectStrategy();
-    sAbstractObjectStrategy.initialize(arr, (long[]) arr.storage);
-    sAbstractObjectStrategy.setIndexableFieldNoTransition(arr, index, value);
-    return sAbstractObjectStrategy;
+    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getSAbstractObjectStrategy();
+    abstractObjectArrayStrategy.initialize(arr, (long[]) arr.storage);
+    abstractObjectArrayStrategy.setIndexableFieldNoTransition(arr, index, value);
+    return abstractObjectArrayStrategy;
   }
 
   public void setIndexableFieldNoTransition(SArray arr, int index, long value) {
