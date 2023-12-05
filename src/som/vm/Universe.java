@@ -45,6 +45,7 @@ import som.vmobjects.storagestrategies.sarray.AbstractObjectArrayStrategy;
 import som.vmobjects.storagestrategies.sarray.DoubleArrayStrategy;
 import som.vmobjects.storagestrategies.sarray.EmptyArrayStrategy;
 import som.vmobjects.storagestrategies.sarray.IntegerArrayStrategy;
+import som.vmobjects.storagestrategies.svector.AbstractObjectVectorStrategy;
 
 
 public class Universe {
@@ -331,8 +332,9 @@ public class Universe {
 
     emptyArrayStrategy = new EmptyArrayStrategy(nilObject);
     abstractObjectArrayStrategy = new AbstractObjectArrayStrategy(nilObject);
-    sIntegerArrayStrategy = new IntegerArrayStrategy();
-    sDoubleArrayStrategy = new DoubleArrayStrategy();
+    integerArrayStrategy = new IntegerArrayStrategy();
+    doubleArrayStrategy = new DoubleArrayStrategy();
+    abstractObjectVectorStrategy = new AbstractObjectVectorStrategy(nilObject);
 
     // Allocate the Metaclass classes
     metaclassClass = newMetaclassClass();
@@ -456,7 +458,7 @@ public class Universe {
   }
 
   public SVector newVector(final long length) {
-    return new SVector(length, nilObject);
+    return new SVector(length, nilObject, this);
   }
 
   public SObject newBoolean(final boolean bool) {
@@ -725,20 +727,24 @@ public class Universe {
     }
   }
 
-  public EmptyArrayStrategy getEmptyStrategy() {
+  public EmptyArrayStrategy getEmptyArrayStrategy() {
     return emptyArrayStrategy;
   }
 
-  public AbstractObjectArrayStrategy getSAbstractObjectStrategy() {
+  public AbstractObjectArrayStrategy getAbstractObjectArrayStrategy() {
     return abstractObjectArrayStrategy;
   }
 
-  public IntegerArrayStrategy getSIntegerStrategy() {
-    return sIntegerArrayStrategy;
+  public IntegerArrayStrategy getIntegerArrayStrategy() {
+    return integerArrayStrategy;
   }
 
-  public DoubleArrayStrategy getSDoubleStrategy() {
-    return sDoubleArrayStrategy;
+  public DoubleArrayStrategy getDoubleArrayStrategy() {
+    return doubleArrayStrategy;
+  }
+
+  public AbstractObjectVectorStrategy getAbstractObjectVectorStrategy() {
+    return abstractObjectVectorStrategy;
   }
 
   public static void errorPrint(final String msg) {
@@ -812,8 +818,9 @@ public class Universe {
 
   private EmptyArrayStrategy emptyArrayStrategy;
   private AbstractObjectArrayStrategy abstractObjectArrayStrategy;
-  private IntegerArrayStrategy sIntegerArrayStrategy;
-  private DoubleArrayStrategy sDoubleArrayStrategy;
+  private IntegerArrayStrategy integerArrayStrategy;
+  private DoubleArrayStrategy doubleArrayStrategy;
+  private AbstractObjectVectorStrategy abstractObjectVectorStrategy;
 
   // TODO: this is not how it is supposed to be... it is just a hack to cope
   // with the use of system.exit in SOM to enable testing

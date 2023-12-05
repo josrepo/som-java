@@ -30,7 +30,7 @@ import som.vmobjects.storagestrategies.sarray.*;
 public class SArray extends SAbstractObject {
 
   public SArray(long numElements) {
-    strategy = Universe.current().getEmptyStrategy();
+    strategy = Universe.current().getEmptyArrayStrategy();
     ((EmptyArrayStrategy) strategy).initialize(this, (int) numElements);
   }
 

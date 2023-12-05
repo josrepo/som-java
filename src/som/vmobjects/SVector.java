@@ -1,139 +1,58 @@
 package som.vmobjects;
 
 import som.vm.Universe;
+import som.vmobjects.storagestrategies.svector.AbstractObjectVectorStrategy;
+import som.vmobjects.storagestrategies.svector.VectorStorageStrategy;
 
 
 public class SVector extends SObject {
 
-  public SVector(final long numElements, final SObject nilObject) {
+  public SVector(final long numElements, final SObject nilObject, final Universe universe) {
     super(3, nilObject);
-    indexableFields = new SAbstractObject[(int) numElements];
-    first = last = 1;
+    strategy = universe.getAbstractObjectVectorStrategy();
+    ((AbstractObjectVectorStrategy) strategy).initialize(this, (int) numElements);
   }
 
   public SAbstractObject getIndexableField(final long index, final SObject nilObject) {
-    final int storeIndex = (int) index + first - 1;
-
-    if (invalidIndex(storeIndex)) {
-      return null;
-    }
-
-    if (indexableFields[storeIndex - 1] == null) {
-      return nilObject;
-    } else {
-      return indexableFields[storeIndex - 1];
-    }
+    return strategy.getIndexableField(this, (int) index, nilObject);
   }
 
   public SAbstractObject getFirstIndexableField(final SObject nilObject) {
-    if (getSize() > 0) {
-      return indexableFields[first - 1];
-    } else {
-      return nilObject;
-    }
+    return strategy.getFirstIndexableField(this, nilObject);
   }
 
   public SAbstractObject getLastIndexableField(final SObject nilObject) {
-    if (getSize() > 0) {
-      return indexableFields[last - 2];
-    } else {
-      return nilObject;
-    }
+    return strategy.getLastIndexableField(this, nilObject);
   }
 
   public int getIndexOfElement(final SAbstractObject element) {
-    for (int i = 0; i < indexableFields.length; i++) {
-      if (indexableFields[i] == element) {
-        return i + 2 - first;
-      }
-    }
-
-    return -1;
+    return strategy.getIndexOfElement(this, element);
   }
 
   public boolean containsElement(final SAbstractObject element) {
-    if (element instanceof SString) {
-      final String elementString = ((SString) element).getEmbeddedString();
-      for (int i = first; i <= last - 1; i++) {
-        if (indexableFields[i - 1] instanceof SString && elementString.equals(((SString) indexableFields[i - 1]).getEmbeddedString())) {
-          return true;
-        }
-      }
-    } else {
-      for (int i = first; i <= last - 1; i++) {
-        if (indexableFields[i - 1] == element) {
-          return true;
-        }
-      }
-    }
-
-    return false;
+    return strategy.containsElement(this, element);
   }
 
   public boolean setIndexableField(final long index, final SAbstractObject value) {
-    final int storeIndex = (int) index + first - 1;
-
-    if (invalidIndex(storeIndex)) {
-      return false;
-    }
-
-    indexableFields[storeIndex - 1] = value;
-
-    return true;
+    final Object[] returnTuple = strategy.setIndexableFieldMaybeTransition(this, (int) index, value);
+    strategy = (VectorStorageStrategy) returnTuple[0];
+    return (boolean) returnTuple[1];
   }
 
   public void setLastIndexableField(final SAbstractObject value) {
-    if (last > indexableFields.length) {
-      final SAbstractObject[] newStorage = new SAbstractObject[2 * indexableFields.length];
-      System.arraycopy(indexableFields, 0, newStorage, 0, indexableFields.length);
-      indexableFields = newStorage;
-    }
-
-    indexableFields[last - 1] = value;
-    last++;
+    strategy = strategy.setLastIndexableFieldMaybeTransition(this, value);
   }
 
   public boolean removeElement(final SAbstractObject element) {
-    final SAbstractObject[] newStorage = new SAbstractObject[indexableFields.length];
-    int newLast = 1;
-    boolean found = false;
-
-    for (int i = first; i < last; i++) {
-      if (indexableFields[i] == element) {
-        found = true;
-      } else {
-        newStorage[i] = indexableFields[i];
-        newLast++;
-      }
-    }
-
-    indexableFields = newStorage;
-    last = newLast;
-    first = 1;
-
-    return found;
+    return strategy.removeElement(this, element);
   }
 
   public SAbstractObject removeFirstElement(final SObject nilObject) {
-    if (last != first) {
-      final SAbstractObject value = indexableFields[first - 1];
-      indexableFields[first - 1] = nilObject;
-      first++;
-      return value == null ? nilObject : value;
-    } else {
-      return null;
-    }
+    return strategy.removeFirstElement(this, nilObject);
   }
 
   public SAbstractObject removeLastElement(final SObject nilObject) {
-    if (getSize() > 0) {
-      last--;
-      final SAbstractObject value = indexableFields[last - 1];
-      indexableFields[last - 1] = nilObject;
-      return value == null ? nilObject : value;
-    } else {
-      return null;
-    }
+    return strategy.removeLastElement(this, nilObject);
   }
 
   public boolean invalidIndex(final long index) {
@@ -149,7 +68,7 @@ public class SVector extends SObject {
   }
 
   public int getCapacity() {
-    return indexableFields.length;
+    return strategy.getCapacity(this);
   }
 
   public int getFirstIndex() {
@@ -160,17 +79,16 @@ public class SVector extends SObject {
     return last;
   }
 
+  public void setFirst(int first) {
+    this.first = first;
+  }
+
+  public void setLast(int last) {
+    this.last = last;
+  }
+
   public SArray asArray(final SObject nilObject) {
-    final SArray arr = new SArray(getSize());
-    for (int i = 0; i < getSize(); i++) {
-      SAbstractObject value = indexableFields[first + i - 1];
-      if (value == null) {
-        arr.setIndexableField(i, nilObject);
-      } else {
-        arr.setIndexableField(i, value);
-      }
-    }
-    return arr;
+    return strategy.asArray(this, nilObject);
   }
 
   @Override
@@ -183,7 +101,8 @@ public class SVector extends SObject {
     return "a " + getSOMClass(Universe.current()).getName().getEmbeddedString();
   }
 
-  private SAbstractObject[] indexableFields;
+  private VectorStorageStrategy strategy;
+  public Object storage;
   private int first, last;
 
 }

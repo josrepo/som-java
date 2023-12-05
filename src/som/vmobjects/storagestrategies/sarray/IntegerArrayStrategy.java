@@ -49,7 +49,7 @@ public class IntegerArrayStrategy extends ArrayStorageStrategy {
       }
     }
 
-    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getSAbstractObjectStrategy();
+    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getAbstractObjectArrayStrategy();
     abstractObjectArrayStrategy.initialize(arr, (long[]) arr.storage);
     abstractObjectArrayStrategy.setIndexableFieldNoTransition(arr, index, value);
     return abstractObjectArrayStrategy;

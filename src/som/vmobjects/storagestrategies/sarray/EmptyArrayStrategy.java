@@ -40,7 +40,7 @@ public class EmptyArrayStrategy extends ArrayStorageStrategy {
       final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
 
       if (embeddedInteger != IntegerArrayStrategy.EMPTY_SLOT) {
-        final IntegerArrayStrategy sIntegerArrayStrategy = Universe.current().getSIntegerStrategy();
+        final IntegerArrayStrategy sIntegerArrayStrategy = Universe.current().getIntegerArrayStrategy();
         sIntegerArrayStrategy.initialize(arr, (int) arr.storage);
         sIntegerArrayStrategy.setIndexableFieldNoTransition(arr, index, embeddedInteger);
         return sIntegerArrayStrategy;
@@ -49,14 +49,14 @@ public class EmptyArrayStrategy extends ArrayStorageStrategy {
       final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
 
       if (embeddedDouble != DoubleArrayStrategy.EMPTY_SLOT) {
-        final DoubleArrayStrategy sDoubleArrayStrategy = Universe.current().getSDoubleStrategy();
+        final DoubleArrayStrategy sDoubleArrayStrategy = Universe.current().getDoubleArrayStrategy();
         sDoubleArrayStrategy.initialize(arr, (int) arr.storage);
         sDoubleArrayStrategy.setIndexableFieldNoTransition(arr, index, embeddedDouble);
         return sDoubleArrayStrategy;
       }
     }
 
-    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getSAbstractObjectStrategy();
+    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getAbstractObjectArrayStrategy();
     abstractObjectArrayStrategy.initialize(arr, (int) arr.storage);
     abstractObjectArrayStrategy.setIndexableFieldNoTransition(arr, index, value);
     return abstractObjectArrayStrategy;

@@ -59,7 +59,7 @@ public class DoubleArrayStrategy extends ArrayStorageStrategy {
       }
     }
 
-    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getSAbstractObjectStrategy();
+    final AbstractObjectArrayStrategy abstractObjectArrayStrategy = Universe.current().getAbstractObjectArrayStrategy();
     abstractObjectArrayStrategy.initialize(arr, (double[]) arr.storage);
     abstractObjectArrayStrategy.setIndexableFieldNoTransition(arr, index, value);
     return abstractObjectArrayStrategy;
