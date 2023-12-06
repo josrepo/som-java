@@ -1,0 +1,127 @@
+package som.vmobjects.storagestrategies.svector;
+
+import som.vm.Universe;
+import som.vmobjects.SAbstractObject;
+import som.vmobjects.SArray;
+import som.vmobjects.SObject;
+import som.vmobjects.SVector;
+
+public class EmptyVectorStrategy extends VectorStorageStrategy {
+
+  private final SObject nilObject;
+
+  public EmptyVectorStrategy(final SObject nilObject) {
+    this.nilObject = nilObject;
+  }
+
+  public void initialize(final SVector vec, final int numElements) {
+    vec.storage = numElements;
+  }
+
+  @Override
+  public SAbstractObject getIndexableField(final SVector vec, final int index, final SObject nilObject) {
+    return nilObject;
+  }
+
+  @Override
+  public SAbstractObject getFirstIndexableField(final SVector vec, final SObject nilObject) {
+    return nilObject;
+  }
+
+  @Override
+  public SAbstractObject getLastIndexableField(final SVector vec, final SObject nilObject) {
+    return nilObject;
+  }
+
+  @Override
+  public int getIndexOfElement(final SVector vec, final SAbstractObject element) {
+    if (vec.getSize() > 0 && element == nilObject) {
+      return vec.getFirstIndex();
+    } else {
+      return -1;
+    }
+  }
+
+  @Override
+  public boolean containsElement(final SVector vec, final SAbstractObject element) {
+      return vec.getSize() > 0 && element == nilObject;
+  }
+
+  @Override
+  public Object[] setIndexableFieldMaybeTransition(final SVector vec, final int index, final SAbstractObject value) {
+    final int storeIndex = index + vec.getFirstIndex() - 1;
+
+    if (vec.invalidIndex(storeIndex)) {
+      return new Object[] {this, false};
+    }
+
+    if (value == nilObject) {
+      return new Object[] {this, true};
+    }
+
+    final AbstractObjectVectorStrategy abstractObjectVectorStrategy = Universe.current().getAbstractObjectVectorStrategy();
+    abstractObjectVectorStrategy.initialize(vec, (int) vec.storage);
+    abstractObjectVectorStrategy.setIndexableFieldNoTransition(vec, index, value);
+    return new Object[] {abstractObjectVectorStrategy, true};
+  }
+
+  @Override
+  public VectorStorageStrategy setLastIndexableFieldMaybeTransition(final SVector vec, final SAbstractObject value) {
+    if (value == nilObject) {
+      vec.setLast(vec.getLastIndex() + 1);
+      return this;
+    }
+
+    final AbstractObjectVectorStrategy abstractObjectVectorStrategy = Universe.current().getAbstractObjectVectorStrategy();
+    abstractObjectVectorStrategy.initialize(vec, (int) vec.storage);
+    abstractObjectVectorStrategy.setLastIndexableFieldNoTransition(vec, value);
+    return abstractObjectVectorStrategy;
+  }
+
+  @Override
+  public int getCapacity(final SVector vec) {
+    return (int) vec.storage;
+  }
+
+  @Override
+  public boolean removeElement(final SVector vec, final SAbstractObject element) {
+    if (element == nilObject) {
+      return false;
+    }
+
+    vec.setFirst(1);
+    vec.setLast(vec.getSize());
+
+    return true;
+  }
+
+  @Override
+  public SAbstractObject removeFirstElement(SVector vec, SObject nilObject) {
+    if (vec.isEmpty()) {
+      return null;
+    } else {
+      vec.setFirst(vec.getFirstIndex() + 1);
+      return nilObject;
+    }
+  }
+
+  @Override
+  public SAbstractObject removeLastElement(SVector vec, SObject nilObject) {
+    if (vec.getSize() > 0) {
+      vec.setLast(vec.getLastIndex() - 1);
+      return nilObject;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public SArray asArray(SVector vec, SObject nilObject) {
+    final SArray arr = new SArray(vec.getSize());
+    for (int i = 0; i < vec.getSize(); i++) {
+        arr.setIndexableField(i, nilObject);
+    }
+    return arr;
+  }
+
+}

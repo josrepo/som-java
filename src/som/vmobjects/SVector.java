@@ -1,7 +1,7 @@
 package som.vmobjects;
 
 import som.vm.Universe;
-import som.vmobjects.storagestrategies.svector.AbstractObjectVectorStrategy;
+import som.vmobjects.storagestrategies.svector.EmptyVectorStrategy;
 import som.vmobjects.storagestrategies.svector.VectorStorageStrategy;
 
 
@@ -9,8 +9,9 @@ public class SVector extends SObject {
 
   public SVector(final long numElements, final SObject nilObject, final Universe universe) {
     super(3, nilObject);
-    strategy = universe.getAbstractObjectVectorStrategy();
-    ((AbstractObjectVectorStrategy) strategy).initialize(this, (int) numElements);
+    strategy = universe.getEmptyVectorStrategy();
+    ((EmptyVectorStrategy) strategy).initialize(this, (int) numElements);
+    first = last = 1;
   }
 
   public SAbstractObject getIndexableField(final long index, final SObject nilObject) {

@@ -46,6 +46,7 @@ import som.vmobjects.storagestrategies.sarray.DoubleArrayStrategy;
 import som.vmobjects.storagestrategies.sarray.EmptyArrayStrategy;
 import som.vmobjects.storagestrategies.sarray.IntegerArrayStrategy;
 import som.vmobjects.storagestrategies.svector.AbstractObjectVectorStrategy;
+import som.vmobjects.storagestrategies.svector.EmptyVectorStrategy;
 
 
 public class Universe {
@@ -334,6 +335,7 @@ public class Universe {
     abstractObjectArrayStrategy = new AbstractObjectArrayStrategy(nilObject);
     integerArrayStrategy = new IntegerArrayStrategy();
     doubleArrayStrategy = new DoubleArrayStrategy();
+    emptyVectorStrategy = new EmptyVectorStrategy(nilObject);
     abstractObjectVectorStrategy = new AbstractObjectVectorStrategy(nilObject);
 
     // Allocate the Metaclass classes
@@ -747,6 +749,10 @@ public class Universe {
     return abstractObjectVectorStrategy;
   }
 
+  public EmptyVectorStrategy getEmptyVectorStrategy() {
+    return emptyVectorStrategy;
+  }
+
   public static void errorPrint(final String msg) {
     // Checkstyle: stop
     System.err.print(msg);
@@ -821,6 +827,7 @@ public class Universe {
   private IntegerArrayStrategy integerArrayStrategy;
   private DoubleArrayStrategy doubleArrayStrategy;
   private AbstractObjectVectorStrategy abstractObjectVectorStrategy;
+  private EmptyVectorStrategy emptyVectorStrategy;
 
   // TODO: this is not how it is supposed to be... it is just a hack to cope
   // with the use of system.exit in SOM to enable testing

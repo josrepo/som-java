@@ -20,8 +20,6 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
     SAbstractObject[] storage = new SAbstractObject[numElements];
     Arrays.fill(storage, value);
     vec.storage = storage;
-    vec.setFirst(1);
-    vec.setLast(1);
   }
 
   @Override
@@ -102,6 +100,10 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
     return new Object[] {this, true};
   }
 
+  public void setIndexableFieldNoTransition(final SVector vec, final int index, final SAbstractObject value) {
+    ((SAbstractObject[]) vec.storage)[index] = value;
+  }
+
   @Override
   public VectorStorageStrategy setLastIndexableFieldMaybeTransition(final SVector vec, final SAbstractObject value) {
     if (vec.getLastIndex() > ((SAbstractObject[]) vec.storage).length) {
@@ -118,6 +120,17 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
 
     public int getCapacity(final SVector vec) {
     return ((SAbstractObject[]) vec.storage).length;
+  }
+
+  public void setLastIndexableFieldNoTransition(final SVector vec, final SAbstractObject value) {
+    if (vec.getLastIndex() > ((SAbstractObject[]) vec.storage).length) {
+      final SAbstractObject[] newStorage = new SAbstractObject[2 * ((SAbstractObject[]) vec.storage).length];
+      System.arraycopy(((SAbstractObject[]) vec.storage), 0, newStorage, 0, ((SAbstractObject[]) vec.storage).length);
+      vec.storage = newStorage;
+    }
+
+    ((SAbstractObject[]) vec.storage)[vec.getLastIndex() - 1] = value;
+    vec.setLast(vec.getLastIndex() + 1);
   }
 
   @Override
