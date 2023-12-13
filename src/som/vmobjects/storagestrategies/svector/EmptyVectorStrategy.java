@@ -1,10 +1,7 @@
 package som.vmobjects.storagestrategies.svector;
 
 import som.vm.Universe;
-import som.vmobjects.SAbstractObject;
-import som.vmobjects.SArray;
-import som.vmobjects.SObject;
-import som.vmobjects.SVector;
+import som.vmobjects.*;
 
 public class EmptyVectorStrategy extends VectorStorageStrategy {
 
@@ -59,6 +56,17 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
       return new Object[] {this, true};
     }
 
+    if (value instanceof SInteger) {
+      final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
+
+      if (embeddedInteger != IntegerVectorStrategy.EMPTY_SLOT) {
+        final IntegerVectorStrategy integerVectorStrategy = Universe.current().getIntegerVectorStrategy();
+        integerVectorStrategy.initialize(vec, (int) vec.storage);
+        integerVectorStrategy.setIndexableFieldNoTransition(vec, index, embeddedInteger);
+        return new Object[] {integerVectorStrategy, true};
+      }
+    }
+
     final AbstractObjectVectorStrategy abstractObjectVectorStrategy = Universe.current().getAbstractObjectVectorStrategy();
     abstractObjectVectorStrategy.initialize(vec, (int) vec.storage);
     abstractObjectVectorStrategy.setIndexableFieldNoTransition(vec, index, value);
@@ -70,6 +78,17 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
     if (value == nilObject) {
       vec.setLast(vec.getLastIndex() + 1);
       return this;
+    }
+
+    if (value instanceof SInteger) {
+      final long embeddedInteger = ((SInteger) value).getEmbeddedInteger();
+
+      if (embeddedInteger != IntegerVectorStrategy.EMPTY_SLOT) {
+        final IntegerVectorStrategy integerVectorStrategy = Universe.current().getIntegerVectorStrategy();
+        integerVectorStrategy.initialize(vec, (int) vec.storage);
+        integerVectorStrategy.setLastIndexableFieldNoTransition(vec, embeddedInteger);
+        return integerVectorStrategy;
+      }
     }
 
     final AbstractObjectVectorStrategy abstractObjectVectorStrategy = Universe.current().getAbstractObjectVectorStrategy();

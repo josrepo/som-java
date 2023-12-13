@@ -16,8 +16,18 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
     initializeAll(vec, nilObject, numElements);
   }
 
+  public void initialize(final SVector vec, final long[] elements) {
+    final SAbstractObject[] storage = new SAbstractObject[elements.length];
+
+    for (int i = 0; i < elements.length; i++) {
+      storage[i] = elements[i] == IntegerVectorStrategy.EMPTY_SLOT ? nilObject : SInteger.getInteger(elements[i]);
+    }
+
+    vec.storage = storage;
+  }
+
   public void initializeAll(final SVector vec, final SAbstractObject value, final int numElements) {
-    SAbstractObject[] storage = new SAbstractObject[numElements];
+    final SAbstractObject[] storage = new SAbstractObject[numElements];
     Arrays.fill(storage, value);
     vec.storage = storage;
   }
@@ -101,7 +111,7 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
   }
 
   public void setIndexableFieldNoTransition(final SVector vec, final int index, final SAbstractObject value) {
-    ((SAbstractObject[]) vec.storage)[index] = value;
+    ((SAbstractObject[]) vec.storage)[index + vec.getFirstIndex() - 2] = value;
   }
 
   @Override
