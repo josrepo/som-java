@@ -26,6 +26,16 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
     vec.storage = storage;
   }
 
+  public void initialize(final SVector vec, final double[] elements) {
+    final SAbstractObject[] storage = new SAbstractObject[elements.length];
+
+    for (int i = 0; i < elements.length; i++) {
+      storage[i] = elements[i] == DoubleVectorStrategy.EMPTY_SLOT ? nilObject : new SDouble(elements[i]);
+    }
+
+    vec.storage = storage;
+  }
+
   public void initializeAll(final SVector vec, final SAbstractObject value, final int numElements) {
     final SAbstractObject[] storage = new SAbstractObject[numElements];
     Arrays.fill(storage, value);

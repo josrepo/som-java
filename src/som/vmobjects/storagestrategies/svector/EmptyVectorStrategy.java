@@ -67,6 +67,17 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
       }
     }
 
+    if (value instanceof SDouble) {
+      final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
+
+      if (embeddedDouble != DoubleVectorStrategy.EMPTY_SLOT) {
+        final DoubleVectorStrategy doubleVectorStrategy = Universe.current().getDoubleVectorStrategy();
+        doubleVectorStrategy.initialize(vec, (int) vec.storage);
+        doubleVectorStrategy.setIndexableFieldNoTransition(vec, index, embeddedDouble);
+        return new Object[] {doubleVectorStrategy, true};
+      }
+    }
+
     final AbstractObjectVectorStrategy abstractObjectVectorStrategy = Universe.current().getAbstractObjectVectorStrategy();
     abstractObjectVectorStrategy.initialize(vec, (int) vec.storage);
     abstractObjectVectorStrategy.setIndexableFieldNoTransition(vec, index, value);
@@ -88,6 +99,17 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
         integerVectorStrategy.initialize(vec, (int) vec.storage);
         integerVectorStrategy.setLastIndexableFieldNoTransition(vec, embeddedInteger);
         return integerVectorStrategy;
+      }
+    }
+
+    if (value instanceof SDouble) {
+      final double embeddedDouble = ((SDouble) value).getEmbeddedDouble();
+
+      if (embeddedDouble != DoubleVectorStrategy.EMPTY_SLOT) {
+        final DoubleVectorStrategy doubleVectorStrategy = Universe.current().getDoubleVectorStrategy();
+        doubleVectorStrategy.initialize(vec, (int) vec.storage);
+        doubleVectorStrategy.setLastIndexableFieldNoTransition(vec, embeddedDouble);
+        return doubleVectorStrategy;
       }
     }
 
