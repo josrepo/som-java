@@ -215,4 +215,18 @@ public class DoubleVectorStrategy extends VectorStorageStrategy {
     }
     return arr;
   }
+
+  @Override
+  public SArray asRawArray(final SVector vec) {
+    final SArray arr = new SArray(((double[]) vec.storage).length);
+    for (int i = 0; i < ((double[]) vec.storage).length; i++) {
+      double value = ((double[]) vec.storage)[i];
+      if (value == EMPTY_SLOT) {
+        arr.setIndexableField(i, Universe.current().nilObject);
+      } else {
+        arr.setIndexableField(i, new SDouble(value));
+      }
+    }
+    return arr;
+  }
 }

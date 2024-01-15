@@ -19,4 +19,6 @@ public abstract class VectorStorageStrategy {
   public abstract SAbstractObject removeFirstElement(SVector vec, SObject nilObject);
   public abstract SAbstractObject removeLastElement(SVector vec, SObject nilObject);
   public abstract SArray asArray(SVector vec, SObject nilObject);
+
+  public abstract SArray asRawArray(SVector vec);
 }

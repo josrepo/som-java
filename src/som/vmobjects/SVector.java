@@ -105,7 +105,7 @@ public class SVector extends SObject {
       case 1:
         return SInteger.getInteger(last);
       case 2:
-        return asArray(Universe.current().nilObject);
+        return strategy.asRawArray(this);
       default:
         return super.getField(index);
     }

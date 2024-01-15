@@ -213,4 +213,13 @@ public class AbstractObjectVectorStrategy extends VectorStorageStrategy {
     return arr;
   }
 
+  @Override
+  public SArray asRawArray(final SVector vec) {
+    final SArray arr = new SArray(((SAbstractObject[]) vec.storage).length);
+    for (int i = 0; i < ((SAbstractObject[]) vec.storage).length; i++) {
+      arr.setIndexableField(i, ((SAbstractObject[]) vec.storage)[i]);
+    }
+    return arr;
+  }
+
 }

@@ -137,7 +137,7 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
   }
 
   @Override
-  public SAbstractObject removeFirstElement(SVector vec, SObject nilObject) {
+  public SAbstractObject removeFirstElement(final SVector vec, final SObject nilObject) {
     if (vec.isEmpty()) {
       return null;
     } else {
@@ -147,7 +147,7 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
   }
 
   @Override
-  public SAbstractObject removeLastElement(SVector vec, SObject nilObject) {
+  public SAbstractObject removeLastElement(final SVector vec, final  SObject nilObject) {
     if (vec.getSize() > 0) {
       vec.setLast(vec.getLastIndex() - 1);
       return nilObject;
@@ -157,10 +157,19 @@ public class EmptyVectorStrategy extends VectorStorageStrategy {
   }
 
   @Override
-  public SArray asArray(SVector vec, SObject nilObject) {
+  public SArray asArray(final SVector vec, final SObject nilObject) {
     final SArray arr = new SArray(vec.getSize());
     for (int i = 0; i < vec.getSize(); i++) {
         arr.setIndexableField(i, nilObject);
+    }
+    return arr;
+  }
+
+  @Override
+  public SArray asRawArray(final SVector vec) {
+    final SArray arr = new SArray((int) vec.storage);
+    for (int i = 0; i < (int) vec.storage; i++) {
+      arr.setIndexableField(i, nilObject);
     }
     return arr;
   }

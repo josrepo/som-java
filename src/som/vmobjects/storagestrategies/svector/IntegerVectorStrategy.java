@@ -215,4 +215,18 @@ public class IntegerVectorStrategy extends VectorStorageStrategy {
     }
     return arr;
   }
+
+  @Override
+  public SArray asRawArray(final SVector vec) {
+    final SArray arr = new SArray(((long[]) vec.storage).length);
+    for (int i = 0; i < ((long[]) vec.storage).length; i++) {
+      long value = ((long[]) vec.storage)[i];
+      if (value == EMPTY_SLOT) {
+        arr.setIndexableField(i, Universe.current().nilObject);
+      } else {
+        arr.setIndexableField(i, SInteger.getInteger(value));
+      }
+    }
+    return arr;
+  }
 }
