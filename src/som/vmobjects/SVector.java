@@ -93,13 +93,22 @@ public class SVector extends SObject {
   }
 
   @Override
-  public SClass getSOMClass(final Universe universe) {
-    return universe.vectorClass;
+  public String toString() {
+    return "a " + getSOMClass(Universe.current()).getName().getEmbeddedString();
   }
 
   @Override
-  public String toString() {
-    return "a " + getSOMClass(Universe.current()).getName().getEmbeddedString();
+  public SAbstractObject getField(final long index) {
+    switch ((int) index) {
+      case 0:
+        return SInteger.getInteger(first);
+      case 1:
+        return SInteger.getInteger(last);
+      case 2:
+        return asArray(Universe.current().nilObject);
+      default:
+        return super.getField(index);
+    }
   }
 
   private VectorStorageStrategy strategy;

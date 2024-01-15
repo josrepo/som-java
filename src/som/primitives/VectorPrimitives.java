@@ -17,8 +17,9 @@ public class VectorPrimitives extends Primitives {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
         SInteger length = (SInteger) frame.pop();
-        frame.pop(); // not required
-        frame.push(universe.newVector(length.getEmbeddedInteger()));
+        SVector vector = universe.newVector(length.getEmbeddedInteger());
+        vector.setClass(frame.pop().getSOMClass(universe));
+        frame.push(vector);
       }
     });
 
