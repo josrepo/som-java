@@ -5,7 +5,19 @@ import som.interpreter.Interpreter;
 import som.vm.Universe;
 import som.vmobjects.*;
 
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.util.Arrays;
+
 public class VectorPrimitives extends Primitives {
+
+  /*
+   * This value must be recomputed and updated whenever the source to Smalltalk/Vector.som changes
+   */
+  public static final byte[] VECTOR_CHECKSUM = new byte[] {-30, -108, -99, -57, -36, 65, 119, -44, 33, -90, -2, -39, 106, 1, -85, 59};
 
   public VectorPrimitives(final Universe universe) {
     super(universe);
@@ -13,6 +25,25 @@ public class VectorPrimitives extends Primitives {
 
   @Override
   public void installPrimitives() {
+    byte[] digest;
+    try {
+      final MessageDigest md = MessageDigest.getInstance("MD5");
+      try (final InputStream is = Files.newInputStream(Paths.get("Smalltalk/Vector.som"));
+           final DigestInputStream dis = new DigestInputStream(is, md)) {
+        dis.readAllBytes();
+      }
+
+      digest = md.digest();
+
+      if (!Arrays.equals(VECTOR_CHECKSUM, digest)) {
+        System.err.println("Warning: Vector checksum mismatch. Primitives not loaded.");
+        return; // Only load primitives if source matches known hash
+      }
+    } catch (final Exception e) {
+      System.err.println("Warning: Cannot determine Vector checksum. Primitives not loaded.");
+      return; // If the checksum cannot be determined due to an exception, then do not load the primitives
+    }
+
     installInstancePrimitive(new SPrimitive("initialize:", universe) {
       @Override
       public void invoke(Frame frame, Interpreter interpreter) {
